@@ -1,5 +1,6 @@
 package com.poc.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +28,15 @@ public class UserController {
 
 		if (!userService.isExistingUser(request.getMobileNumber())) {
 			WelcomeResponse welcomeResponse = new WelcomeResponse(StringUtils.WELCOME_MESSAGE);
-			welcomeResponse.setLanguages(userService.getAllLanguges());
+			List<String> languages = userService.getAllLanguges();
+            welcomeResponse.setLanguages(languages);
 			
-			System.out.println(welcomeResponse.toString());
-			
-			return ResponseEntity.ok()
-					.headers(welcomeResponse.getHeaders())
-					.body(welcomeResponse.getImageData());
-
+			 return ResponseEntity.ok(welcomeResponse);
+			 
+				/*
+				 * return ResponseEntity.ok() .headers(welcomeResponse.getHeaders())
+				 * .body(welcomeResponse.getImageData());//which gives the image
+				 */
 		} else {
 			
 		}

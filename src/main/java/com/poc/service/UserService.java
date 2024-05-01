@@ -25,7 +25,6 @@ public class UserService {
 
 	public List<String> getAllLanguges() {
 		List<String> allLanguageNames = languageRepository.findAllLanguageNames();
-		System.out.println("***All Languages " + allLanguageNames.toString());
 		return allLanguageNames;
 	}
 
