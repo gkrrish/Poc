@@ -9,6 +9,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "USER_DETAILS")
@@ -19,6 +21,7 @@ public class UserDetails {
 	private Long userid;
 
 	@Column(name = "mobilenumber", nullable = false, length = 13, unique = true)
+	@NotNull
 	private String mobileNumber;
 
 	@Column(name = "username", nullable = false, length = 50)
@@ -28,6 +31,7 @@ public class UserDetails {
 	private Integer age;
 
 	@Column(name = "gender", nullable = false, length = 10)
+	@Pattern(regexp = "^(Male|Female|Other)$")
 	private String gender;
 
 	@Column(name = "location", length = 100)
@@ -37,6 +41,7 @@ public class UserDetails {
 	private Timestamp registrationDate;
 
 	@Column(name = "active", nullable = false, length = 1)
+	@Pattern(regexp = "^[YN]$")
 	private Character active;
 
 	public UserDetails() {

@@ -1,11 +1,13 @@
 package com.poc.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.poc.entity.UserDetails;
+import com.poc.master.repository.IndianNewspaperLanguageRepository;
 import com.poc.repository.UserDetailsRepository;
 
 @Service
@@ -13,31 +15,22 @@ public class UserService {
 
 	@Autowired
 	private UserDetailsRepository userDetailsRepository;
-	
-	
+	@Autowired
+	private IndianNewspaperLanguageRepository languageRepository;
 
-	public UserDetails getSubscriptionDetails(String mobileNumber) {
-
-		UserDetails byMobileNumber = userDetailsRepository.findByMobileNumber(mobileNumber);
-		if (byMobileNumber != null) {
-			List<Object[]> x = userDetailsRepository.findSubscriptionDetailsByMobileNumber(mobileNumber);
-			
-			for (Object[] result : x) {
-			    String mobileNumber1 = (String) result[0];
-			    String newspaperName = (String) result[1];
-			    String batchTime = (String) result[2];
-
-			    System.out.println("Mobile Number: " + mobileNumber1);
-			    System.out.println("Newspaper Name: " + newspaperName);
-			    System.out.println("Batch Time: " + batchTime);
-			    System.out.println(); // Add a blank line for separation
-			}
-			
-		}
-
-		return null;
+	public boolean isExistingUser(String mobileNumber) {
+		UserDetails userDetails = userDetailsRepository.findByMobileNumber(mobileNumber);
+		return userDetails==null ? false : true;
 	}
 
-	
+	public List<String> getAllLanguges() {
+		List<String> allLanguageNames = languageRepository.findAllLanguageNames();
+		System.out.println("***All Languages " + allLanguageNames.toString());
+		return allLanguageNames;
+	}
+
+	public Optional<UserDetails> getUserDetails(Long userId) {
+		return userDetailsRepository.findById(userId);
+	}
 
 }
