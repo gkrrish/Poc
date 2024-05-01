@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.poc.entity.UserDetails;
@@ -24,25 +26,29 @@ public class UserController {
 	private UserService userService;
 
 	@PostMapping("/welcome") // fake charges?
+	@ResponseStatus
 	public ResponseEntity<?> welcomeUser(@RequestBody WelcomeRequest request) {
 
-		if (!userService.isExistingUser(request.getMobileNumber())) {
+		if (userService.notExistingUser(request.getMobileNumber())) {
 			WelcomeResponse welcomeResponse = new WelcomeResponse(StringUtils.WELCOME_MESSAGE);
 			List<String> languages = userService.getAllLanguges();
-            welcomeResponse.setLanguages(languages);
-			
-			 return ResponseEntity.ok(welcomeResponse);
-			 
-				/*
-				 * return ResponseEntity.ok() .headers(welcomeResponse.getHeaders())
-				 * .body(welcomeResponse.getImageData());//which gives the image
-				 */
+			welcomeResponse.setLanguages(languages);
+
+			return ResponseEntity.ok(welcomeResponse);
+
 		} else {
-			
+
 		}
 
 		return ResponseEntity.ok("welcome-okay");
 
+	}
+	
+	@GetMapping("/states/{mobileNumber}")
+	@ResponseStatus
+	@ResponseBody
+	public List<String> getStates(@PathVariable String mobileNumber){
+		return userService.getAllStates();
 	}
 
 	@GetMapping("/{userId}")
