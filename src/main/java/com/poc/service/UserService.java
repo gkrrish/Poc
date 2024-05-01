@@ -9,8 +9,19 @@ import org.springframework.stereotype.Service;
 
 import com.poc.entity.UserDetails;
 import com.poc.master.entity.State;
+import com.poc.master.entity.Vendor;
+import com.poc.master.entity.VendorDetails;
+import com.poc.master.repository.BatchJobRepository;
+import com.poc.master.repository.CategoryTypeRepository;
+import com.poc.master.repository.CountryRepository;
+import com.poc.master.repository.DistrictRepository;
 import com.poc.master.repository.IndianNewspaperLanguageRepository;
+import com.poc.master.repository.MandalRepository;
 import com.poc.master.repository.StateRepository;
+import com.poc.master.repository.StatewiseLocationRepository;
+import com.poc.master.repository.SubscriptionTypeRepository;
+import com.poc.master.repository.VendorDetailsRepository;
+import com.poc.master.repository.VendorRepository;
 import com.poc.repository.UserDetailsRepository;
 
 @Service
@@ -22,6 +33,24 @@ public class UserService {
 	private IndianNewspaperLanguageRepository languageRepository;
 	@Autowired
 	private StateRepository stateRepository;
+	@Autowired
+	private CountryRepository countryRepository;
+	@Autowired
+	private DistrictRepository districtRepository;
+	@Autowired
+	private MandalRepository mandalRepository;
+	@Autowired
+	private StatewiseLocationRepository statewiseLocationRepository;
+	@Autowired
+	private BatchJobRepository batchJobRepository;
+	@Autowired
+	private SubscriptionTypeRepository subscriptionTypeRepository;
+	@Autowired
+	private CategoryTypeRepository categoryTypeRepository;
+	@Autowired
+	private VendorDetailsRepository vendorDetailsRepository;
+	@Autowired
+	private VendorRepository vendorRepository;
 
 	public boolean notExistingUser(String mobileNumber) {
 		UserDetails userDetails = userDetailsRepository.findByMobileNumber(mobileNumber);
@@ -39,6 +68,10 @@ public class UserService {
 
 	public List<String> getAllStates() {
 		return stateRepository.findAll().stream().map(State::getStateName).collect(Collectors.toList());
+	}
+
+	public List<Vendor> getTest() {
+		return vendorRepository.findAll();
 	}
 
 }
