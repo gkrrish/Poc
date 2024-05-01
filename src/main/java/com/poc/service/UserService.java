@@ -13,6 +13,8 @@ public class UserService {
 
 	@Autowired
 	private UserDetailsRepository userDetailsRepository;
+	
+	
 
 	public UserDetails getSubscriptionDetails(String mobileNumber) {
 
@@ -35,5 +37,7 @@ public class UserService {
 
 		return null;
 	}
+
+	
 
 }
