@@ -28,7 +28,7 @@ public class WelcomeResponse {
 
     private void loadImageBytes() {
         try {
-            ClassPathResource resource = new ClassPathResource("C:\\Users\\Gaganam Krishna\\Desktop\\Images\\poc\\welcome-banner.PNG");
+            ClassPathResource resource = new ClassPathResource("images/welcome-banner.PNG");
             this.imageData = Files.readAllBytes(resource.getFile().toPath());
 
             this.headers = new HttpHeaders();

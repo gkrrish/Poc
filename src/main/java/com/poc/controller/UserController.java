@@ -28,6 +28,9 @@ public class UserController {
 		if (!userService.isExistingUser(request.getMobileNumber())) {
 			WelcomeResponse welcomeResponse = new WelcomeResponse(StringUtils.WELCOME_MESSAGE);
 			welcomeResponse.setLanguages(userService.getAllLanguges());
+			
+			System.out.println(welcomeResponse.toString());
+			
 			return ResponseEntity.ok()
 					.headers(welcomeResponse.getHeaders())
 					.body(welcomeResponse.getImageData());
