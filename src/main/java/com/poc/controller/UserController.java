@@ -14,14 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.poc.entity.UserDetails;
-import com.poc.master.entity.BatchJob;
-import com.poc.master.entity.CategoryType;
-import com.poc.master.entity.District;
-import com.poc.master.entity.Mandal;
-import com.poc.master.entity.StatewiseLocation;
-import com.poc.master.entity.SubscriptionType;
-import com.poc.master.entity.Vendor;
-import com.poc.master.entity.VendorDetails;
+import com.poc.entity.UserSubscription;
 import com.poc.request.WelcomeRequest;
 import com.poc.response.WelcomeResponse;
 import com.poc.service.UserService;
@@ -60,8 +53,8 @@ public class UserController {
 	}
 	
 	@GetMapping("/test")
-	public List<Vendor> getTest(){
-		List<Vendor> test = userService.getTest();
+	public String getTest(){
+		String test = userService.getTest();
 		return test;
 	}
 	

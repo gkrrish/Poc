@@ -8,13 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.poc.entity.UserDetails;
+import com.poc.entity.UserSubscription;
 import com.poc.master.entity.State;
-import com.poc.master.entity.Vendor;
-import com.poc.master.entity.VendorDetails;
 import com.poc.master.repository.BatchJobRepository;
 import com.poc.master.repository.CategoryTypeRepository;
 import com.poc.master.repository.CountryRepository;
 import com.poc.master.repository.DistrictRepository;
+import com.poc.master.repository.GenerateLocationNameRepository;
 import com.poc.master.repository.IndianNewspaperLanguageRepository;
 import com.poc.master.repository.MandalRepository;
 import com.poc.master.repository.StateRepository;
@@ -23,6 +23,7 @@ import com.poc.master.repository.SubscriptionTypeRepository;
 import com.poc.master.repository.VendorDetailsRepository;
 import com.poc.master.repository.VendorRepository;
 import com.poc.repository.UserDetailsRepository;
+import com.poc.repository.UserSubscriptionRepository;
 
 @Service
 public class UserService {
@@ -51,6 +52,10 @@ public class UserService {
 	private VendorDetailsRepository vendorDetailsRepository;
 	@Autowired
 	private VendorRepository vendorRepository;
+	@Autowired
+	private UserSubscriptionRepository userSubscriptionRepository;
+	@Autowired
+    private GenerateLocationNameRepository locationRepository;
 
 	public boolean notExistingUser(String mobileNumber) {
 		UserDetails userDetails = userDetailsRepository.findByMobileNumber(mobileNumber);
@@ -70,8 +75,12 @@ public class UserService {
 		return stateRepository.findAll().stream().map(State::getStateName).collect(Collectors.toList());
 	}
 
-	public List<Vendor> getTest() {
-		return vendorRepository.findAll();
+	public String getTest() {
+		return generateLocationName(1, 1, 1, 1);
 	}
+	
+	public String generateLocationName(int countryId, int stateId, int districtId, int mandalId) {
+        return locationRepository.generateLocationName(countryId, stateId, districtId, mandalId);
+    }
 
 }
