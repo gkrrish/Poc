@@ -1,5 +1,6 @@
 package com.poc.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -58,15 +59,15 @@ public class UserService {
             details.setDistrict((String) row[4]);
             details.setMandal((String) row[5]);
             details.setBatchTime((String) row[6]);
-            details.setSubscriptionCharges((int) row[7]);
-            details.setSubscriptionChargesPerMonth(String.valueOf(row[7])); 
+            details.setSubscriptionCharges((BigDecimal) row[7]);
+            details.setSubscriptionChargesPerMonth((BigDecimal)(row[7])); 
             return details;
         }).collect(Collectors.toList());
 
         existingUserDetails.setDetails(detailsList);
 
         double totalSubscriptionCharges = detailsList.stream()
-                .mapToDouble(Details::getSubscriptionCharges)
+        		.mapToDouble(details -> details.getSubscriptionCharges().doubleValue()) 
                 .sum();
         existingUserDetails.setTotalSubscriptionCharges(totalSubscriptionCharges);
         

@@ -15,7 +15,7 @@ public interface UserDetailsRepository extends JpaRepository<UserDetails, Long> 
 	
 	UserDetails findByMobileNumber(String mobileNumber);
 	
-	@Query(value = "SELECT ud.mobile_number AS mobileNumber, " +
+	@Query(value = "SELECT ud.mobilenumber AS mobileNumber, " +
             "v.newspaper_name AS newspaperName, " +
             "mil.language_name AS language, " +
             "ms.state_name AS state, " +
@@ -33,7 +33,7 @@ public interface UserDetailsRepository extends JpaRepository<UserDetails, Long> 
             "JOIN MASTER_STATES ms ON msl.state_id = ms.state_id " +
             "JOIN MASTER_BATCH_JOBS mbj ON us.batch_id = mbj.BATCH_ID " +
             "JOIN SUBSCRIPTION_TYPE st ON v.subscription_type_id = st.subscriptiontypeid " +
-            "WHERE ud.mobile_number = :mobileNumber " +
+            "WHERE ud.mobilenumber = :mobileNumber " +
             "AND v.vendor_id IN ( " +
             "    SELECT vendorid " +
             "    FROM VENDOR_DETAILS " +
