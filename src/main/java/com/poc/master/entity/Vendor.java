@@ -2,6 +2,7 @@ package com.poc.master.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,7 +29,7 @@ public class Vendor {
 	private StatewiseLocation location;
 
 	@ManyToOne
-	@JoinColumn(name = "newspaper_language", referencedColumnName = "languageId")
+	@JoinColumn(name = "newspaper_language", referencedColumnName = "language_id")
 	private IndianNewspaperLanguage newspaperLanguage;
 
 	@ManyToOne
@@ -41,5 +42,13 @@ public class Vendor {
 	@ManyToOne
 	@JoinColumn(name = "vendor_id", referencedColumnName = "vendorid")
 	private VendorDetails vendor;
+	
+	
+	@Column(name = "category_id") 
+    private Long categoryId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id", referencedColumnName = "category_id", insertable = false, updatable = false)
+    private CategoryType category;
 
 }

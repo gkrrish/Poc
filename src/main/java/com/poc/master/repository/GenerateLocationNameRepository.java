@@ -10,9 +10,8 @@ import com.poc.master.entity.StatewiseLocation;
 @Repository
 public interface GenerateLocationNameRepository extends JpaRepository<StatewiseLocation, Long> {
 
-	@Query(value = "SELECT generate_location_name(:country_id, :state_id, :district_id, :mandal_id) FROM DUAL", nativeQuery = true)
-    String generateLocationName(@Param("country_id") Integer countryId,
-                                @Param("state_id") Integer stateId,
+	@Query(value = "SELECT generate_location_name(:state_id, :district_id, :mandal_id) FROM DUAL", nativeQuery = true)
+    String generateLocationName(@Param("state_id") Integer stateId,
                                 @Param("district_id") Integer districtId,
                                 @Param("mandal_id") Integer mandalId);
 

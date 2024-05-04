@@ -10,9 +10,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.Data;
 
 @Entity
 @Table(name = "USER_DETAILS")
+@Data
 public class UserDetails {
 
 	@Id

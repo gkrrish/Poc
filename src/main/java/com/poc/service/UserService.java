@@ -8,22 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.poc.entity.UserDetails;
-import com.poc.entity.UserSubscription;
 import com.poc.master.entity.State;
-import com.poc.master.repository.BatchJobRepository;
-import com.poc.master.repository.CategoryTypeRepository;
-import com.poc.master.repository.CountryRepository;
-import com.poc.master.repository.DistrictRepository;
-import com.poc.master.repository.GenerateLocationNameRepository;
 import com.poc.master.repository.IndianNewspaperLanguageRepository;
-import com.poc.master.repository.MandalRepository;
 import com.poc.master.repository.StateRepository;
-import com.poc.master.repository.StatewiseLocationRepository;
-import com.poc.master.repository.SubscriptionTypeRepository;
-import com.poc.master.repository.VendorDetailsRepository;
-import com.poc.master.repository.VendorRepository;
 import com.poc.repository.UserDetailsRepository;
-import com.poc.repository.UserSubscriptionRepository;
+import com.poc.response.Details;
+import com.poc.response.ExistingUserDetails;
 
 @Service
 public class UserService {
@@ -34,32 +24,9 @@ public class UserService {
 	private IndianNewspaperLanguageRepository languageRepository;
 	@Autowired
 	private StateRepository stateRepository;
-	@Autowired
-	private CountryRepository countryRepository;
-	@Autowired
-	private DistrictRepository districtRepository;
-	@Autowired
-	private MandalRepository mandalRepository;
-	@Autowired
-	private StatewiseLocationRepository statewiseLocationRepository;
-	@Autowired
-	private BatchJobRepository batchJobRepository;
-	@Autowired
-	private SubscriptionTypeRepository subscriptionTypeRepository;
-	@Autowired
-	private CategoryTypeRepository categoryTypeRepository;
-	@Autowired
-	private VendorDetailsRepository vendorDetailsRepository;
-	@Autowired
-	private VendorRepository vendorRepository;
-	@Autowired
-	private UserSubscriptionRepository userSubscriptionRepository;
-	@Autowired
-    private GenerateLocationNameRepository locationRepository;
 
-	public boolean notExistingUser(String mobileNumber) {
-		UserDetails userDetails = userDetailsRepository.findByMobileNumber(mobileNumber);
-		return userDetails==null ? true : false;
+	public UserDetails notExistingUser(String mobileNumber) {
+		return userDetailsRepository.findByMobileNumber(mobileNumber);
 	}
 
 	public List<String> getAllLanguges() {
@@ -75,12 +42,35 @@ public class UserService {
 		return stateRepository.findAll().stream().map(State::getStateName).collect(Collectors.toList());
 	}
 
-	public String getTest() {
-		return generateLocationName(1, 1, 1, 1);
+	public ExistingUserDetails getSubscriptioinDetails(String mobileNumber) {
+		UserDetails userDetails = userDetailsRepository.findByMobileNumber(mobileNumber);
+		//control logic move here later
+		List<Object[]> queryResults = userDetailsRepository.getUserDetailsByMobileNumber(mobileNumber);
+
+        ExistingUserDetails existingUserDetails = new ExistingUserDetails();
+        existingUserDetails.setMobileNumber(userDetails.getMobileNumber());
+
+        List<Details> detailsList = queryResults.stream().map(row -> {
+            Details details = new Details();
+            details.setNewsPaperName((String) row[1]);
+            details.setLanguage((String) row[2]);
+            details.setState((String) row[3]);
+            details.setDistrict((String) row[4]);
+            details.setMandal((String) row[5]);
+            details.setBatchTime((String) row[6]);
+            details.setSubscriptionCharges((int) row[7]);
+            details.setSubscriptionChargesPerMonth(String.valueOf(row[7])); 
+            return details;
+        }).collect(Collectors.toList());
+
+        existingUserDetails.setDetails(detailsList);
+
+        double totalSubscriptionCharges = detailsList.stream()
+                .mapToDouble(Details::getSubscriptionCharges)
+                .sum();
+        existingUserDetails.setTotalSubscriptionCharges(totalSubscriptionCharges);
+        
+        return existingUserDetails;
 	}
-	
-	public String generateLocationName(int countryId, int stateId, int districtId, int mandalId) {
-        return locationRepository.generateLocationName(countryId, stateId, districtId, mandalId);
-    }
 
 }

@@ -12,8 +12,6 @@ import lombok.NoArgsConstructor;
 public class ExistingUserDetails {
 
 	private String mobileNumber;
-	private List<String> languages;
-	private List<String> subscribedNewsPapers;
-	private List<String> NewsPaperBatchTime; //change later this all
-	
+	private List<Details> details;
+	private double totalSubscriptionCharges;
 }
