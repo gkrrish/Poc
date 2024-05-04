@@ -51,7 +51,20 @@ public class UserService {
         ExistingUserDetails existingUserDetails = new ExistingUserDetails();
         existingUserDetails.setMobileNumber(userDetails.getMobileNumber());
 
-        List<Details> detailsList = queryResults.stream().map(row -> {
+        List<Details> detailsList = existingUserConversion(queryResults);
+
+        existingUserDetails.setDetails(detailsList);
+
+        double totalSubscriptionCharges = detailsList.stream()
+        		.mapToDouble(details -> details.getSubscriptionCharges().doubleValue()) 
+                .sum();
+        existingUserDetails.setTotalSubscriptionCharges(totalSubscriptionCharges);
+        
+        return existingUserDetails;
+	}
+
+	private List<Details> existingUserConversion(List<Object[]> queryResults) {
+		return queryResults.stream().map(row -> {
             Details details = new Details();
             details.setNewsPaperName((String) row[1]);
             details.setLanguage((String) row[2]);
@@ -63,15 +76,6 @@ public class UserService {
             details.setSubscriptionChargesPerMonth((BigDecimal)(row[7])); 
             return details;
         }).collect(Collectors.toList());
-
-        existingUserDetails.setDetails(detailsList);
-
-        double totalSubscriptionCharges = detailsList.stream()
-        		.mapToDouble(details -> details.getSubscriptionCharges().doubleValue()) 
-                .sum();
-        existingUserDetails.setTotalSubscriptionCharges(totalSubscriptionCharges);
-        
-        return existingUserDetails;
 	}
 
 }

@@ -1,10 +1,13 @@
 package com.poc.controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.poc.entity.UserDetails;
+import com.poc.pdfservice.PdfService;
 import com.poc.request.WelcomeRequest;
 import com.poc.response.ExistingUserDetails;
 import com.poc.response.WelcomeResponse;
@@ -26,6 +30,8 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private PdfService pdfService;
 
 	@PostMapping("/welcome") // fake charges?
 	@ResponseStatus
@@ -41,7 +47,18 @@ public class UserController {
 
 		} else {
 			ExistingUserDetails existingUserDetails = userService.getSubscriptioinDetails(userDetails.getMobileNumber());
-			return new ResponseEntity<>(existingUserDetails, HttpStatus.OK);
+			byte[] invoice = null;
+			try {
+				invoice = pdfService.generateInvoice(existingUserDetails);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "invoice.pdf"); // Specify filename for download
+
+            return new ResponseEntity<>(invoice, headers, HttpStatus.OK);
 
 		}
 	}
