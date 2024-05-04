@@ -1,59 +1,53 @@
 package com.poc.pdfservice;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.property.TextAlignment;
 import com.poc.response.Details;
 import com.poc.response.ExistingUserDetails;
+import com.poc.util.PDFReportUtils;
 
 @Service
 public class PdfService {
 
 	public byte[] generateInvoice(ExistingUserDetails userDetails) throws IOException {
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-		PdfWriter writer = new PdfWriter(outputStream);
-		PdfDocument pdfDocument = new PdfDocument(writer);
-
-		// Create a Document instance with desired page size
-		Document document = new Document(pdfDocument, PageSize.A4);
-
-		try {
-			// Add content to PDF
-			document.add(new Paragraph("Invoice for Mobile Number: " + userDetails.getMobileNumber())
-					.setTextAlignment(TextAlignment.CENTER).setFontSize(12));
-
-			List<Details> detailsList = userDetails.getDetails();
-			for (Details details : detailsList) {
-				document.add(new Paragraph("Newspaper Name: " + details.getNewsPaperName()));
-				document.add(new Paragraph("Language: " + details.getLanguage()));
-				document.add(new Paragraph("State: " + details.getState()));
-				document.add(new Paragraph("District: " + details.getDistrict()));
-				document.add(new Paragraph("Mandal: " + details.getMandal()));
-				document.add(new Paragraph("Batch Time: " + details.getBatchTime()));
-				document.add(new Paragraph("Subscription Charges: " + details.getSubscriptionCharges()));
-				document.add(new Paragraph("----------------------------------------------"));
-			}
-
-			// Calculate and add total subscription charges
-			double totalSubscriptionCharges = userDetails.getTotalSubscriptionCharges();
-			document.add(new Paragraph("Total Subscription Charges: " + totalSubscriptionCharges)
-					.setTextAlignment(TextAlignment.RIGHT).setBold().setFontSize(12));
-		} finally {
-			// Ensure document is properly closed
-			document.close();
-		}
-
-		return outputStream.toByteArray();
+		PDFReportUtils report = PDFReportUtils.getInstance();
+		report.setPageSize(PageSize.A4.rotate());
+		
+		report.addParagraph(new Paragraph("News paper Subscription Details "+userDetails.getMobileNumber())
+                .setFontSize(12f)
+                .setTextAlignment(TextAlignment.JUSTIFIED)
+                .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA))
+        );
+		
+		report.addNewLine();
+        report.openTable(7);
+        report.addTableHeader("NEWSPAPER", "LANGUAGE", "STATE", "DISTRICT", "MANDAL", "BATCH TIME","CHARGES");
+        
+        List<Details> detailsList = userDetails.getDetails();
+        for (Details details : detailsList) {
+        	report.addTableColumn(details.getNewsPaperName());
+        	report.addTableColumn(details.getLanguage());
+        	report.addTableColumn(details.getState());
+        	report.addTableColumn(details.getDistrict());
+        	report.addTableColumn(details.getMandal());
+        	report.addTableColumn(details.getBatchTime());
+        	report.addTableColumn(details.getSubscriptionCharges());
+        }
+        double totalSubscriptionCharges = userDetails.getTotalSubscriptionCharges();
+        report.addParagraph(new Paragraph("Total Subscription Charges :"+totalSubscriptionCharges)
+        						.setTextAlignment(TextAlignment.RIGHT).setBold().setFontSize(12f));
+        
+        report.closeTable();
+        report.closeDocument();
+        return report.baos.toByteArray();
 	}
 
 }
