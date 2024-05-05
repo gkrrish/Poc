@@ -5,6 +5,9 @@ import org.springframework.stereotype.Repository;
 
 import com.poc.master.entity.Country;
 
+
 @Repository
 public interface CountryRepository extends JpaRepository<Country, Integer> {
+	
+	Country findByCountryName(String countryName);
 }

@@ -9,8 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.poc.entity.UserDetails;
+import com.poc.master.entity.Country;
 import com.poc.master.entity.State;
+import com.poc.master.repository.CountryRepository;
+import com.poc.master.repository.DistrictRepository;
 import com.poc.master.repository.IndianNewspaperLanguageRepository;
+import com.poc.master.repository.MandalRepository;
 import com.poc.master.repository.StateRepository;
 import com.poc.repository.UserDetailsRepository;
 import com.poc.response.Details;
@@ -24,11 +28,13 @@ public class UserService {
 	@Autowired
 	private IndianNewspaperLanguageRepository languageRepository;
 	@Autowired
+	private CountryRepository countryRepository;
+	@Autowired
 	private StateRepository stateRepository;
-
-	public UserDetails notExistingUser(String mobileNumber) {
-		return userDetailsRepository.findByMobileNumber(mobileNumber);
-	}
+	@Autowired
+	private DistrictRepository districtRepository;
+	@Autowired
+	private MandalRepository mandalRepository;
 
 	public List<String> getAllLanguges() {
 		List<String> allLanguageNames = languageRepository.findAllLanguageNames();
@@ -39,13 +45,19 @@ public class UserService {
 		return userDetailsRepository.findById(userId);
 	}
 
-	public List<String> getAllStates() {
-		return stateRepository.findAll().stream().map(State::getStateName).collect(Collectors.toList());
+	public List<String> getAllStates(String countryName) {
+		Country country = countryRepository.findByCountryName(countryName);
+		return stateRepository.findAllByCountryId(country.getCountryId())
+                .stream()
+                .map(State::getStateName)
+                .collect(Collectors.toList());
 	}
 
 	public ExistingUserDetails getSubscriptioinDetails(String mobileNumber) {
 		UserDetails userDetails = userDetailsRepository.findByMobileNumber(mobileNumber);
-		//control logic move here later
+		if(userDetails==null) {
+			return new ExistingUserDetails();
+		}
 		List<Object[]> queryResults = userDetailsRepository.getUserDetailsByMobileNumber(mobileNumber);
 
         ExistingUserDetails existingUserDetails = new ExistingUserDetails();
@@ -63,6 +75,14 @@ public class UserService {
         return existingUserDetails;
 	}
 
+	
+	public List<String> getAllDistricts(String stateName) {
+		return districtRepository.findAllDistrictNamesByStateName(stateName);
+	}
+	public List<String> getAllMandals(String districtName) {
+		return mandalRepository.findAllMandalNamesByDistrictName(districtName);
+	}
+	
 	private List<Details> existingUserConversion(List<Object[]> queryResults) {
 		return queryResults.stream().map(row -> {
             Details details = new Details();
@@ -77,5 +97,8 @@ public class UserService {
             return details;
         }).collect(Collectors.toList());
 	}
+
+	
+
 
 }

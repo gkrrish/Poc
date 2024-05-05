@@ -1,5 +1,6 @@
 package com.poc.controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,15 +34,13 @@ public class UserController {
 	private UserService userService;
 	@Autowired
 	private PdfService pdfService;
-	@Autowired
-    private TemplateEngine templateEngine;
 
 	@PostMapping("/welcome") // fake charges?
 	@ResponseStatus
 	public ResponseEntity<?> welcomeUser(@RequestBody WelcomeRequest request) {
-		UserDetails userDetails = userService.notExistingUser(request.getMobileNumber());
+		ExistingUserDetails existingUserDetails = userService.getSubscriptioinDetails(request.getMobileNumber());
 
-		if (userDetails == null) {
+		if (existingUserDetails.getMobileNumber().isEmpty() || existingUserDetails.getMobileNumber().isBlank()) {
 			WelcomeResponse welcomeResponse = new WelcomeResponse(StringUtils.WELCOME_MESSAGE);
 			List<String> languages = userService.getAllLanguges();
 			welcomeResponse.setLanguages(languages);
@@ -49,27 +48,41 @@ public class UserController {
 			return ResponseEntity.ok(welcomeResponse);
 
 		} else {
-			ExistingUserDetails existingUserDetails = userService.getSubscriptioinDetails(userDetails.getMobileNumber());
-            
-			Context context = new Context();
-	        context.setVariable("existingUserDetails", existingUserDetails);
-	        String htmlContent = templateEngine.process("invoice-template", context);
-	        byte[] invoice = pdfService.convertHTMLtoPDF(htmlContent);
-	        
-	        HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDispositionFormData("attachment", "invoice.pdf"); 
+			byte[] invoice = null;
+			try {
+				invoice = pdfService.generateInvoice(existingUserDetails);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 
-            return new ResponseEntity<>(invoice, headers, HttpStatus.OK);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_PDF);
+			headers.setContentDispositionFormData("attachment", "invoice.pdf");
+
+			return new ResponseEntity<>(invoice, headers, HttpStatus.OK);
 
 		}
 	}
 
 	@GetMapping("/states/{mobileNumber}")
-	@ResponseStatus
+	@ResponseStatus(value = HttpStatus.OK)
 	@ResponseBody
 	public List<String> getStates(@PathVariable String mobileNumber) {
-		return userService.getAllStates();
+		return userService.getAllStates("India");
+	}
+
+	@GetMapping("/states/{mobileNumber}/{stateName}")
+	@ResponseStatus(value = HttpStatus.OK)
+	@ResponseBody
+	public List<String> getDistricts(@PathVariable String mobileNumber, @PathVariable String stateName) {
+		return userService.getAllDistricts(stateName);
+	}
+	
+	@GetMapping("/states/{mobileNumber}/{district}")
+	@ResponseStatus(value = HttpStatus.OK)
+	@ResponseBody
+	public List<String> getMandals(@PathVariable String mobileNumber, @PathVariable String districtName) {
+		return userService.getAllMandals(districtName);
 	}
 
 	@GetMapping("/{userId}")
