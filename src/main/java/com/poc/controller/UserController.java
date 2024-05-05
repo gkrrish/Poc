@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,26 +50,17 @@ public class UserController {
 
 		} else {
 			ExistingUserDetails existingUserDetails = userService.getSubscriptioinDetails(userDetails.getMobileNumber());
-			/*byte[] invoice = null;
-			try {
-				invoice = pdfService.generateInvoice(existingUserDetails);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-			HttpHeaders headers = new HttpHeaders();
+            
+			Context context = new Context();
+	        context.setVariable("existingUserDetails", existingUserDetails);
+	        String htmlContent = templateEngine.process("invoice-template", context);
+	        byte[] invoice = pdfService.convertHTMLtoPDF(htmlContent);
+	        
+	        HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDispositionFormData("attachment", "invoice.pdf"); 
 
             return new ResponseEntity<>(invoice, headers, HttpStatus.OK);
-            
-            */
-			Context context = new Context();
-	        context.setVariable("existingUserDetails", existingUserDetails);
-	        String htmlContent = templateEngine.process("invoice-template", context);
-	        HttpHeaders headers = new HttpHeaders();
-	        headers.add("Content-Type", "text/html; charset=UTF-8");
-	        return new ResponseEntity<>(htmlContent, headers, HttpStatus.OK);
 
 		}
 	}

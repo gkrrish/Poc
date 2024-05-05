@@ -1,9 +1,11 @@
 package com.poc.pdfservice;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.font.PdfFontFactory;
@@ -13,6 +15,7 @@ import com.itextpdf.layout.property.TextAlignment;
 import com.poc.response.Details;
 import com.poc.response.ExistingUserDetails;
 import com.poc.util.PDFReportUtils;
+
 
 @Service
 public class PdfService {
@@ -48,6 +51,17 @@ public class PdfService {
         report.closeTable();
         report.closeDocument();
         return report.baos.toByteArray();
+	}
+	
+	public byte[] convertHTMLtoPDF(String htmlContent) {
+		
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ITextRenderer renderer = new ITextRenderer();
+        renderer.setDocumentFromString(htmlContent);
+        renderer.layout();
+        renderer.createPDF(outputStream, false);
+        renderer.finishPDF();
+        return outputStream.toByteArray();
 	}
 
 }
