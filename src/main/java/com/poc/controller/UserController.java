@@ -71,14 +71,14 @@ public class UserController {
 		return userService.getAllStates("India");
 	}
 
-	@GetMapping("/states/{mobileNumber}/{stateName}")
+	@GetMapping("/districts/{mobileNumber}/{stateName}")
 	@ResponseStatus(value = HttpStatus.OK)
 	@ResponseBody
 	public List<String> getDistricts(@PathVariable String mobileNumber, @PathVariable String stateName) {
 		return userService.getAllDistricts(stateName);
 	}
 	
-	@GetMapping("/states/{mobileNumber}/{district}")
+	@GetMapping("/mandals/{mobileNumber}/{districtName}")
 	@ResponseStatus(value = HttpStatus.OK)
 	@ResponseBody
 	public List<String> getMandals(@PathVariable String mobileNumber, @PathVariable String districtName) {
