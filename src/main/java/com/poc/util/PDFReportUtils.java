@@ -1,17 +1,19 @@
 package com.poc.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
+import org.springframework.util.ObjectUtils;
+
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.TextAlignment;
-import org.springframework.util.ObjectUtils;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 
 public final class PDFReportUtils {
 
@@ -55,7 +57,8 @@ public final class PDFReportUtils {
     public void addTableHeader(String... headers) {
         this.validateTable();
         for (String header : headers) {
-            this.table.addHeaderCell(header);
+            this.table.addHeaderCell(new Cell().add(new Paragraph(header))
+                    .setBackgroundColor(ColorConstants.LIGHT_GRAY));
         }
     }
 

@@ -29,7 +29,7 @@ public class PdfService {
 		
 		report.addNewLine();
         report.openTable(7);
-        report.addTableHeader("NEWSPAPER", "LANGUAGE", "STATE", "DISTRICT", "MANDAL", "BATCH TIME","CHARGES");
+        report.addTableHeader("NEWSPAPER", "LANGUAGE", "STATE", "DISTRICT", "MANDAL", "SCHEDULED TIME","MONTLY SUBSCRIPTION CHARGES");
         
         List<Details> detailsList = userDetails.getDetails();
         for (Details details : detailsList) {

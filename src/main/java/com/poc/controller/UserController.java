@@ -1,13 +1,11 @@
 package com.poc.controller;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import com.poc.entity.UserDetails;
 import com.poc.pdfservice.PdfService;
@@ -32,6 +32,8 @@ public class UserController {
 	private UserService userService;
 	@Autowired
 	private PdfService pdfService;
+	@Autowired
+    private TemplateEngine templateEngine;
 
 	@PostMapping("/welcome") // fake charges?
 	@ResponseStatus
@@ -47,7 +49,7 @@ public class UserController {
 
 		} else {
 			ExistingUserDetails existingUserDetails = userService.getSubscriptioinDetails(userDetails.getMobileNumber());
-			byte[] invoice = null;
+			/*byte[] invoice = null;
 			try {
 				invoice = pdfService.generateInvoice(existingUserDetails);
 			} catch (IOException e) {
@@ -56,9 +58,17 @@ public class UserController {
 			
 			HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDispositionFormData("attachment", "invoice.pdf"); // Specify filename for download
+            headers.setContentDispositionFormData("attachment", "invoice.pdf"); 
 
             return new ResponseEntity<>(invoice, headers, HttpStatus.OK);
+            
+            */
+			Context context = new Context();
+	        context.setVariable("existingUserDetails", existingUserDetails);
+	        String htmlContent = templateEngine.process("invoice-template", context);
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.add("Content-Type", "text/html; charset=UTF-8");
+	        return new ResponseEntity<>(htmlContent, headers, HttpStatus.OK);
 
 		}
 	}
