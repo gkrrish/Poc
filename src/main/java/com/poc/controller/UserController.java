@@ -1,5 +1,6 @@
 package com.poc.controller;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -16,9 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
+import com.poc.customeinvoice.GeneratePdf_Modified;
 import com.poc.entity.UserDetails;
 import com.poc.pdfservice.PdfService;
 import com.poc.request.WelcomeRequest;
@@ -29,7 +29,7 @@ import com.poc.util.StringUtils;
 
 @RestController
 public class UserController {
-
+/*
 	@Autowired
 	private UserService userService;
 	@Autowired
@@ -93,6 +93,13 @@ public class UserController {
 		} else {
 			return ResponseEntity.notFound().build();
 		}
+	}*/
+	
+	@GetMapping("/test")
+	public String getTest() throws FileNotFoundException {
+		GeneratePdf_Modified general=new GeneratePdf_Modified();
+		general.customePDF();
+		return "OK";
 	}
 
 }
