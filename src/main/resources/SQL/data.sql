@@ -24,7 +24,8 @@ INSERT INTO MASTER_STATEWISE_LOCATIONS (
     mandal_id
 ) VALUES (
     1,
-    generate_location_name(2, 1, 1, 1), 
+    --generate_location_name(2, 1, 1, 1), 
+    'generatedlocation',
     2,  -- Country ID for India
     1, -- State ID for Telangana
     1,  -- District ID for the district
@@ -40,10 +41,12 @@ VALUES (1, 'Krishna', 30, 'Male', 'Hyderabad', TIMESTAMP '2024-04-27 10:00:00', 
 TRUNCATE TABLE MASTER_BATCH_JOBS;
 
 INSERT INTO MASTER_BATCH_JOBS (BATCH_ID, DELIVERY_TIME)
-SELECT ROWNUM AS BATCH_ID,
-       TO_CHAR(TIMESTAMP '2024-04-28 04:00:00' + INTERVAL '30' MINUTE * (ROWNUM - 1), 'HH:MI AM') AS DELIVERY_TIME
-FROM dual
-CONNECT BY LEVEL <= 48;
+SELECT id, TO_CHAR(TIMESTAMP '2024-04-28 04:00:00' + INTERVAL '30 MINUTE' * (id - 1), 'HH:MI AM') AS DELIVERY_TIME
+FROM MASTER_BATCH_JOBS  
+ORDER BY id
+LIMIT 48;
+
+
 
 COMMIT;
 ----------------------------------------------
