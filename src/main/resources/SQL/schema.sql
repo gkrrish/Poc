@@ -163,3 +163,12 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Location Name: ' || loc_name);
 END;
 ===================================================================================================================================
+CREATE TABLE USER_STATUS (
+    UserID NUMBER(10),
+    ValidateWhatsAppUser CHAR(1) CHECK (ValidateWhatsAppUser IN ('Y', 'N')),
+    Blocked CHAR(1) CHECK (Blocked IN ('Y', 'N')),
+    Active CHAR(1) CHECK (Active IN ('Y', 'N')),
+    NotReachable CHAR(1) CHECK (NotReachable IN ('Y', 'N')),
+    PRIMARY KEY (UserID),
+    FOREIGN KEY (UserID) REFERENCES USER_DETAILS(UserID)
+);

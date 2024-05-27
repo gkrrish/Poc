@@ -26,7 +26,7 @@ public interface UserDetailsRepository extends JpaRepository<UserDetails, Long> 
             "FROM USER_DETAILS ud " +
             "JOIN USER_SUBSCRIPTION us ON ud.UserID = us.user_id " +
             "JOIN VENDORS v ON us.newspaper_id = v.newspaper_id " +
-            "JOIN MASTER_INDIAN_NEWSPAPER_LANGUAGES mil ON v.newspaper_language = mil.language_id " +
+            "JOIN MASTER_NEWS_LANGUAGES mil ON v.newspaper_language = mil.language_id " +
             "JOIN MASTER_STATEWISE_LOCATIONS msl ON us.location_id = msl.location_id " +
             "JOIN MASTER_MANDALS mm ON msl.mandal_id = mm.mandal_id " +
             "JOIN MASTER_DISTRICTS md ON msl.district_id = md.district_id " +

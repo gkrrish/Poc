@@ -68,3 +68,22 @@ INSERT INTO USER_SUBSCRIPTION (user_id, newspaper_id, batch_id, user_eligible, l
 INSERT INTO USER_SUBSCRIPTION (user_id, newspaper_id, batch_id, user_eligible, location_id)VALUES (1, 2, 2, 1, 2);
 INSERT INTO USER_SUBSCRIPTION (user_id, newspaper_id, batch_id, user_eligible, location_id)VALUES (1, 2, 8, 1, 1);
 INSERT INTO USER_SUBSCRIPTION (user_id, newspaper_id, batch_id, user_eligible, location_id)VALUES (1, 3, 9, 1, 2);
+
+
+INSERT INTO USER_STATUS (
+    UserID,
+    ValidateWhatsAppUser,
+    Blocked,
+    Active,
+    NotReachable
+) VALUES (
+    1,          -- This should be an existing UserID in the USER_DETAILS table
+    'Y',        -- ValidateWhatsAppUser: 'Y' (Yes) or 'N' (No)
+    'N',        -- Blocked: 'Y' (Yes) or 'N' (No)
+    'Y',        -- Active: 'Y' (Yes) or 'N' (No)
+    'N'         -- NotReachable: 'Y' (Yes) or 'N' (No)
+);
+
+
+
+

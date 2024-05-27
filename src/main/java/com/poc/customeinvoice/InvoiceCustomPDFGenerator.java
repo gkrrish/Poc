@@ -5,11 +5,15 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-public class GeneratePdf_Modified {
-    public void customePDF() throws FileNotFoundException {
-        LocalDate ld= LocalDate.now();
-        String pdfName= ld+".pdf";
-        CodingErrorPdfInvoiceCreator cepdf=new CodingErrorPdfInvoiceCreator(pdfName);
+
+import com.poc.entity.UserDetails;
+public class InvoiceCustomPDFGenerator {
+	
+    public byte[] customePDF(UserDetails userDetails) throws FileNotFoundException {
+    	userDetails=new UserDetails();
+    	userDetails.setMobileNumber("+919876543210");
+        String pdfName= userDetails.getMobileNumber()+".pdf";
+        InvoiceGenerator cepdf=new InvoiceGenerator(pdfName);
         cepdf.createDocument();
 
         //Create Header start
@@ -21,12 +25,12 @@ public class GeneratePdf_Modified {
         //Create Address start
         AddressDetails addressDetails=new AddressDetails();
         addressDetails
-                .setBillingCompany("Coding Error")
-                .setBillingName("Bhaskar")
-                .setBillingAddress("Bangluru,karnataka,india\n djdj\ndsjdsk")
-                .setBillingEmail("codingerror303@gmail.com")
-                .setShippingName("Customer Name \n")
-                .setShippingAddress("Banglore Name sdss\n swjs\n")
+                .setBillingCompany("News on whatsApp ")
+                .setBillingName("Krishna::Hyderabad")
+                .setBillingAddress("Hyderabad-5000088")
+                .setBillingEmail("now@newsonwhatsapp.com")
+                .setShippingName("Krishna :: User")
+                .setShippingAddress("Hyderabad::Telangana::India")
                 .build();
 
         cepdf.createAddress(addressDetails);
@@ -41,12 +45,12 @@ public class GeneratePdf_Modified {
         //Product End
 
         //Term and Condition Start
-        List<String> TncList=new ArrayList<>();
-        TncList.add("1. The Seller shall not be liable to the Buyer directly or indirectly for any loss or damage suffered by the Buyer.");
-        TncList.add("2. The Seller warrants the product for one (1) year from the date of shipment");
-        String imagePath="src/main/resources/ce_logo_circle_transparent.png";
-        cepdf.createTnc(TncList,false,imagePath);
+        List<String> TermsAndConditionsList=new ArrayList<>();
+        TermsAndConditionsList.add(":: Get the News paper daily on whatsApp ::");
+        String imagePath="src/main/resources/images/nowlogo.png";
+        cepdf.createTermsAndConditions(TermsAndConditionsList,false,imagePath);
         // Term and condition end
-        System.out.println("pdf genrated");
+        
+        return cepdf.getPdfBytes();
     }
 }
