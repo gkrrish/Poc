@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "MASTER_INDIAN_NEWSPAPER_LANGUAGES")
+@Table(name = "MASTER_NEWS_LANGUAGES")
 @Data
 public class IndianNewspaperLanguage {
 

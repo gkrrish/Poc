@@ -66,12 +66,6 @@
 			<artifactId>flying-saucer-pdf-openpdf</artifactId>
 			<version>9.1.22</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
-			<scope>runtime</scope>
-		</dependency>
 	</dependencies>
 
 	<build>
