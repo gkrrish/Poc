@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.poc.customeinvoice.InvoiceCustomPDFGenerator;
+import com.poc.customeinvoice.InvoiceCustomPDFService;
 import com.poc.entity.UserDetails;
 import com.poc.pdfservice.PdfService;
 import com.poc.request.WelcomeRequest;
@@ -97,12 +97,13 @@ public class UserController {
 	
 	@GetMapping("/test")
 	public ResponseEntity<?> getTest() throws FileNotFoundException {
-		InvoiceCustomPDFGenerator general=new InvoiceCustomPDFGenerator();
-		byte[] customePDF = general.customePDF(null);
+		ExistingUserDetails existingUserDetails = userService.getSubscriptioinDetails("+919876543210");
+		InvoiceCustomPDFService general=new InvoiceCustomPDFService();
+		byte[] customePDF = general.customePDF(existingUserDetails);
 		
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_PDF);
-		headers.setContentDispositionFormData("attachment", "invoice.pdf");
+		headers.setContentDispositionFormData("attachment", existingUserDetails.getMobileNumber()+".pdf");
 
 		return new ResponseEntity<>(customePDF, headers, HttpStatus.OK);
 	}

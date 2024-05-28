@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class ExistingUserDetails {
 
 	private String mobileNumber;
-	private List<Details> details;
+	private List<UserDetailsResponse> details;
 	private double totalSubscriptionCharges;
 }

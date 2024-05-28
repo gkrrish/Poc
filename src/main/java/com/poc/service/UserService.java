@@ -17,7 +17,7 @@ import com.poc.master.repository.IndianNewspaperLanguageRepository;
 import com.poc.master.repository.MandalRepository;
 import com.poc.master.repository.StateRepository;
 import com.poc.repository.UserDetailsRepository;
-import com.poc.response.Details;
+import com.poc.response.UserDetailsResponse;
 import com.poc.response.ExistingUserDetails;
 
 @Service
@@ -63,7 +63,7 @@ public class UserService {
         ExistingUserDetails existingUserDetails = new ExistingUserDetails();
         existingUserDetails.setMobileNumber(userDetails.getMobileNumber());
 
-        List<Details> detailsList = existingUserConversion(queryResults);
+        List<UserDetailsResponse> detailsList = existingUserConversion(queryResults);
 
         existingUserDetails.setDetails(detailsList);
 
@@ -83,9 +83,9 @@ public class UserService {
 		return mandalRepository.findAllMandalNamesByDistrictName(districtName);
 	}
 	
-	private List<Details> existingUserConversion(List<Object[]> queryResults) {
+	private List<UserDetailsResponse> existingUserConversion(List<Object[]> queryResults) {
 		return queryResults.stream().map(row -> {
-            Details details = new Details();
+            UserDetailsResponse details = new UserDetailsResponse();
             details.setNewsPaperName((String) row[1]);
             details.setLanguage((String) row[2]);
             details.setState((String) row[3]);

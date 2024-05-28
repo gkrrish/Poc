@@ -12,7 +12,7 @@ import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.property.TextAlignment;
-import com.poc.response.Details;
+import com.poc.response.UserDetailsResponse;
 import com.poc.response.ExistingUserDetails;
 import com.poc.util.PDFReportUtils;
 
@@ -34,8 +34,8 @@ public class PdfService {
         report.openTable(7);
         report.addTableHeader("NEWSPAPER", "LANGUAGE", "STATE", "DISTRICT", "MANDAL", "SCHEDULED TIME","MONTLY SUBSCRIPTION CHARGES");
         
-        List<Details> detailsList = userDetails.getDetails();
-        for (Details details : detailsList) {
+        List<UserDetailsResponse> detailsList = userDetails.getDetails();
+        for (UserDetailsResponse details : detailsList) {
         	report.addTableColumn(details.getNewsPaperName());
         	report.addTableColumn(details.getLanguage());
         	report.addTableColumn(details.getState());

@@ -2,11 +2,11 @@ package com.poc.customeinvoice;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.itextpdf.kernel.colors.DeviceGray;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
@@ -21,6 +21,7 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.TextAlignment;
+import com.poc.response.UserDetailsResponse;
 
 public class InvoiceGenerator {
 	Document document;
@@ -31,7 +32,9 @@ public class InvoiceGenerator {
 	float twocol150 = twocol + 150f;
 	float twocolumnWidth[] = { twocol150, twocol };
 	float threeColumnWidth[] = { threecol, threecol, threecol };
+	float sevenColumnWidth[] = { threecol, threecol, threecol, threecol, threecol, threecol, threecol };
 	float fullwidth[] = { threecol * 3 };
+	float oneColumnWidth[] ={ 500f };
 	ByteArrayOutputStream byteArrayOutputStream;
 
 	public InvoiceGenerator(String pdfName) {
@@ -57,28 +60,31 @@ public class InvoiceGenerator {
 		    
 			document.add(tb);
 		} else {
-			pdfDocument.addEventHandler(PdfDocumentEvent.END_PAGE, new MyFooter(document, TermsAndConditionsList, imagePath));
+			pdfDocument.addEventHandler(PdfDocumentEvent.END_PAGE, new FooterPDFTemplate(document, TermsAndConditionsList, imagePath));
 		}
 
 		document.close();
 	}
 
-	public void createProduct(List<Product> productList) {
+	public void createUserDetailsResponse(List<UserDetailsResponse> userDetailsResponseList) {
 		float threecol = 190f;
-		float fullwidth[] = { threecol * 3 };
-		Table threeColTable2 = new Table(threeColumnWidth);
-		float totalSum = getTotalSum(productList);
-		for (Product product : productList) {
-			float total = product.getQuantity() * product.getPriceperpeice();
-			threeColTable2
-					.addCell(new Cell().add(new Paragraph(product.getPname().orElse(""))).setBorder(Border.NO_BORDER))
-					.setMarginLeft(10f);
-			threeColTable2.addCell(new Cell().add(new Paragraph(String.valueOf(product.getQuantity())))
-					.setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
-			threeColTable2.addCell(new Cell().add(new Paragraph(String.valueOf(total)))
-					.setTextAlignment(TextAlignment.RIGHT).setBorder(Border.NO_BORDER)).setMarginRight(15f);
+		float fullwidth[] = { threecol * 7 };
+		float threecolmn=110f;
+		float[] sevenColumnsWidthx= {threecolmn,threecolmn,threecolmn,threecolmn,threecolmn,threecolmn,threecolmn};
+		Table threeColTable2 = new Table(sevenColumnsWidthx);
+		float totalSum = getTotalSum(userDetailsResponseList);
+		
+		for (UserDetailsResponse userDetailsResponse : userDetailsResponseList) {
+		    BigDecimal total = userDetailsResponse.getSubscriptionCharges().multiply(userDetailsResponse.getSubscriptionCharges());
+		    threeColTable2.addCell(new Cell().add(new Paragraph("NEWSPAPER")).setBold().setFontColor(new DeviceGray(1.0f)).setBorder(Border.NO_BORDER));
+		    threeColTable2.addCell(new Cell().add(new Paragraph("LANGUAGE")).setBold().setFontColor(new DeviceGray(1.0f)).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
+		    threeColTable2.addCell(new Cell().add(new Paragraph("STATE")).setBold().setFontColor(new DeviceGray(1.0f)).setTextAlignment(TextAlignment.RIGHT).setBorder(Border.NO_BORDER)).setMarginRight(15f);
+		    threeColTable2.addCell(new Cell().add(new Paragraph("DISTRICT")).setBold().setFontColor(new DeviceGray(1.0f)).setBorder(Border.NO_BORDER));
+		    threeColTable2.addCell(new Cell().add(new Paragraph("MANDAL")).setBold().setFontColor(new DeviceGray(1.0f)).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
+		    threeColTable2.addCell(new Cell().add(new Paragraph("SCHEDULED TIME")).setBold().setFontColor(new DeviceGray(1.0f)).setTextAlignment(TextAlignment.RIGHT).setBorder(Border.NO_BORDER)).setMarginRight(15f);
+		    threeColTable2.addCell(new Cell().add(new Paragraph("MONTLY SUBSCRIPTION CHARGES")).setBold().setFontColor(new DeviceGray(1.0f)).setBorder(Border.NO_BORDER));
 		}
-
+		
 		document.add(threeColTable2.setMarginBottom(20f));
 		float onetwo[] = { threecol + 125f, threecol * 2 };
 		Table threeColTable4 = new Table(onetwo);
@@ -88,45 +94,33 @@ public class InvoiceGenerator {
 
 		Table threeColTable3 = new Table(threeColumnWidth);
 		threeColTable3.addCell(new Cell().add(new Paragraph("")).setBorder(Border.NO_BORDER)).setMarginLeft(10f);
-		threeColTable3.addCell(new Cell().add(new Paragraph("Total")).setTextAlignment(TextAlignment.CENTER)
-				.setBorder(Border.NO_BORDER));
-		threeColTable3.addCell(new Cell().add(new Paragraph(String.valueOf(totalSum)))
-				.setTextAlignment(TextAlignment.RIGHT).setBorder(Border.NO_BORDER)).setMarginRight(15f);
+		threeColTable3.addCell(new Cell().add(new Paragraph("Total")).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
+		threeColTable3.addCell(new Cell().add(new Paragraph(String.valueOf(totalSum))).setTextAlignment(TextAlignment.RIGHT).setBorder(Border.NO_BORDER)).setMarginRight(15f);
 
 		document.add(threeColTable3);
 		document.add(fullwidthDashedBorder(fullwidth));
 		document.add(new Paragraph("\n"));
-		document.add(
-				getDividerTable(fullwidth).setBorder(new SolidBorder(new DeviceGray(0.5f), 1)).setMarginBottom(15f));
+		document.add(getDividerTable(fullwidth).setBorder(new SolidBorder(new DeviceGray(0.5f), 1)).setMarginBottom(15f));
 	}
 
-	public float getTotalSum(List<Product> productList) {
-		return (float) productList.stream().mapToLong((p) -> (long) (p.getQuantity() * p.getPriceperpeice())).sum();
-	}
-
-	public List<Product> getDummyProductList() {
-		List<Product> productList = new ArrayList<>();
-		productList.add(new Product("apple", 2, 159));
-		productList.add(new Product("mango", 4, 205));
-		productList.add(new Product("banana", 2, 90));
-		productList.add(new Product("grapes", 3, 10));
-		productList.add(new Product("apple", 5, 159));
-		productList.add(new Product("kiwi", 2, 90));
-		return productList;
+	public float getTotalSum(List<UserDetailsResponse> userResponseList) {
+		return (float) 10f;
 	}
 
 	public void createTableHeader(ProductTableHeader productTableHeader) {
-		Paragraph producPara = new Paragraph("Products");
+		Paragraph producPara = new Paragraph("News paper Subscription Details ");
 		document.add(producPara.setBold());
-		Table threeColTable1 = new Table(threeColumnWidth);
+		Table threeColTable1 = new Table(sevenColumnWidth);
 		threeColTable1.setBackgroundColor(new DeviceGray(0.0f), 0.7f);
 
-		threeColTable1.addCell(new Cell().add(new Paragraph("Description")).setBold().setFontColor(new DeviceGray(1.0f))
-				.setBorder(Border.NO_BORDER));
-		threeColTable1.addCell(new Cell().add(new Paragraph("Quantity")).setBold().setFontColor(new DeviceGray(1.0f))
-				.setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
-		threeColTable1.addCell(new Cell().add(new Paragraph("Price")).setBold().setFontColor(new DeviceGray(1.0f))
-				.setTextAlignment(TextAlignment.RIGHT).setBorder(Border.NO_BORDER)).setMarginRight(15f);
+		threeColTable1.addCell(new Cell().add(new Paragraph("NEWSPAPER")).setBold().setFontColor(new DeviceGray(1.0f)).setBorder(Border.NO_BORDER));
+		threeColTable1.addCell(new Cell().add(new Paragraph("LANGUAGE")).setBold().setFontColor(new DeviceGray(1.0f)).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
+		threeColTable1.addCell(new Cell().add(new Paragraph("STATE")).setBold().setFontColor(new DeviceGray(1.0f)).setTextAlignment(TextAlignment.RIGHT).setBorder(Border.NO_BORDER)).setMarginRight(15f);
+		threeColTable1.addCell(new Cell().add(new Paragraph("DISTRICT")).setBold().setFontColor(new DeviceGray(1.0f)).setBorder(Border.NO_BORDER));
+		threeColTable1.addCell(new Cell().add(new Paragraph("MANDAL")).setBold().setFontColor(new DeviceGray(1.0f)).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
+		threeColTable1.addCell(new Cell().add(new Paragraph("SCHEDULED TIME")).setBold().setFontColor(new DeviceGray(1.0f)).setTextAlignment(TextAlignment.RIGHT).setBorder(Border.NO_BORDER)).setMarginRight(15f);
+		threeColTable1.addCell(new Cell().add(new Paragraph("MONTLY SUBSCRIPTION CHARGES")).setBold().setFontColor(new DeviceGray(1.0f)).setBorder(Border.NO_BORDER));
+		
 		document.add(threeColTable1);
 	}
 
@@ -177,18 +171,22 @@ public class InvoiceGenerator {
 		document.add(getNewLineParagraph());
 	}
 
-	public List<Product> modifyProductList(List<Product> productList) {
-		Map<String, Product> map = new HashMap<>();
-		productList.forEach((i) -> {
-			if (map.containsKey(i.getPname().orElse(""))) {
-				i.setQuantity(map.getOrDefault(i.getPname().orElse(""), null).getQuantity() + i.getQuantity());
-				map.put(i.getPname().orElse(""), i);
-			} else {
-				map.put(i.getPname().orElse(""), i);
-			}
-		});
-		return map.values().stream().collect(Collectors.toList());
-
+	public List<UserDetailsResponse> modifyUserDetailsList(List<UserDetailsResponse> detailsList) {
+	    Map<String, UserDetailsResponse> map = new HashMap<>();
+	    
+	    for (UserDetailsResponse details : detailsList) {
+	        String key = details.getNewsPaperName();
+	        if (map.containsKey(key)) {
+	            UserDetailsResponse existingDetails = map.get(key);
+	            BigDecimal updatedCharges = existingDetails.getSubscriptionCharges().add(details.getSubscriptionCharges());
+	            existingDetails.setSubscriptionCharges(updatedCharges);
+	            map.put(key, existingDetails);
+	        } else {
+	            map.put(key, details);
+	        }
+	    }
+	    
+	    return new ArrayList<>(map.values());
 	}
 
 	static Table getDividerTable(float[] fullwidth) {
