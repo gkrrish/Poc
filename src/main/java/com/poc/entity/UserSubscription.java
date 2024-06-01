@@ -3,7 +3,6 @@ package com.poc.entity;
 import com.poc.master.entity.BatchJob;
 import com.poc.master.entity.Vendor;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -33,6 +32,4 @@ public class UserSubscription {
 	@JoinColumn(name = "batch_id")
 	private BatchJob batch;
 
-	@Column(name = "user_eligible", columnDefinition = "NUMBER(1,0) DEFAULT 1")
-	private Boolean userEligible = true;
 }

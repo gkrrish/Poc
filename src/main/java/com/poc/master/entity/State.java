@@ -23,9 +23,6 @@ public class State {
 
 	@Column(name = "state_name")
 	private String stateName;
-
-	@Column(name = "country_id")
-	private Integer countryId;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "country_id", referencedColumnName = "country_id", insertable = false, updatable = false)
