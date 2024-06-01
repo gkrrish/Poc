@@ -95,14 +95,14 @@ public class UserService {
 	private List<UserDetailsResponse> existingUserConversion(List<Object[]> queryResults) {
 		return queryResults.stream().map(row -> {
             UserDetailsResponse details = new UserDetailsResponse();
-            details.setNewsPaperName((String) row[1]);
-            details.setLanguage((String) row[2]);
-            details.setState((String) row[3]);
-            details.setDistrict((String) row[4]);
-            details.setMandal((String) row[5]);
-            details.setBatchTime((String) row[6]);
-            details.setSubscriptionCharges((BigDecimal) row[7]);
-            details.setSubscriptionChargesPerMonth((BigDecimal)(row[7])); 
+            details.setNewsPaperName((String) row[2]);
+            details.setLanguage((String) row[3]);
+            details.setState((String) row[4]);
+            details.setDistrict((String) row[5]);
+            details.setMandal((String) row[6]);
+            details.setBatchTime((String) row[7]);
+            details.setSubscriptionCharges(new BigDecimal(row[9].toString()));
+            details.setSubscriptionChargesPerMonth(new BigDecimal(row[9].toString()));
             return details;
         }).collect(Collectors.toList());
 	}
