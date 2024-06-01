@@ -124,32 +124,32 @@ public class InvoiceGenerator {
 		document.add(threeColTable1);
 	}
 
+	//Billing and Adress Template design
 	public void createAddress(AddressDetails addressDetails) {
+		 // Step 1: Create a Table with Two Columns
 		Table twoColTable = new Table(twocolumnWidth);
-		twoColTable.addCell(getBillingandShippingCell(addressDetails.getBillingInfoText()));
-		twoColTable.addCell(getBillingandShippingCell(addressDetails.getShippingInfoText()));
+		twoColTable.addCell(getBillingandShippingCell("TAX INVOICE (Original for the Receipient)"));
+		twoColTable.addCell(getBillingandShippingCell("News On WhatsApp !"));
 		document.add(twoColTable.setMarginBottom(12f));
-		// iNFO FIRST ROW
+		
+		// First row /record
 		Table twoColTable2 = new Table(twocolumnWidth);
-		twoColTable2.addCell(getCell10fLeft(addressDetails.getBillingCompanyText(), true));
-		twoColTable2.addCell(getCell10fLeft(addressDetails.getShippingNameText(), true));
-		twoColTable2.addCell(getCell10fLeft(addressDetails.getBillingCompany(), false));
-		twoColTable2.addCell(getCell10fLeft(addressDetails.getShippingName(), false));
+		twoColTable2.addCell(getCell10fLeft("Mobile number :"+addressDetails.getBillingMobileNumber(), true));
+		twoColTable2.addCell(getCell10fLeft(addressDetails.getBillingName(), false));
+		twoColTable2.addCell(getCell10fLeft(addressDetails.getNowAddress(), false));
 		document.add(twoColTable2);
-
+		
+		// Second row /record
 		Table twoColTable3 = new Table(twocolumnWidth);
-		twoColTable3.addCell(getCell10fLeft(addressDetails.getBillingNameText(), true));
-		twoColTable3.addCell(getCell10fLeft(addressDetails.getShippingAddressText(), true));
-		twoColTable3.addCell(getCell10fLeft(addressDetails.getBillingName(), false));
-		twoColTable3.addCell(getCell10fLeft(addressDetails.getShippingAddress(), false));
+		twoColTable3.addCell(getCell10fLeft(addressDetails.getBillingAddress(), false));
+		twoColTable3.addCell(getCell10fLeft("Call us on : +91-1234567890", true));
+		
 		document.add(twoColTable3);
 		float oneColoumnwidth[] = { twocol150 };
-
+		
+		// One column width, Third row /record
 		Table oneColTable1 = new Table(oneColoumnwidth);
-		oneColTable1.addCell(getCell10fLeft(addressDetails.getBillingAddressText(), true));
-		oneColTable1.addCell(getCell10fLeft(addressDetails.getBillingAddress(), false));
-		oneColTable1.addCell(getCell10fLeft(addressDetails.getBillingEmailText(), true));
-		oneColTable1.addCell(getCell10fLeft(addressDetails.getBillingEmail(), false));
+		oneColTable1.addCell(getCell10fLeft("Bill for Current month", true));
 		document.add(oneColTable1.setMarginBottom(10f));
 		document.add(fullwidthDashedBorder(fullwidth));
 	}

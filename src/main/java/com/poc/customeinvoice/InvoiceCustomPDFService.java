@@ -24,14 +24,10 @@ public class InvoiceCustomPDFService {
 
         //Create Address start
         AddressDetails addressDetails=new AddressDetails();
-        addressDetails
-                .setBillingCompany("News on whatsApp ")
-                .setBillingName("Krishna::Hyderabad")
-                .setBillingAddress("Hyderabad-5000088")
-                .setBillingEmail("now@newsonwhatsapp.com")
-                .setShippingName("Krishna :: User")
-                .setShippingAddress("Hyderabad::Telangana::India")
-                .build();
+        addressDetails.setBillingName("G Krishna");
+        addressDetails.setBillingMobileNumber(userDetails.getMobileNumber());
+        addressDetails.setBillingAddress("HyderabaD");
+        addressDetails.setNowAddress("Now- Hyderabad - 500088");
 
         cepdf.createAddress(addressDetails);
         //Address end
