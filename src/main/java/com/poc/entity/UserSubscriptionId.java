@@ -2,8 +2,11 @@ package com.poc.entity;
 
 import java.io.Serializable;
 
-import jakarta.persistence.Column;
+import com.poc.master.entity.Vendor;
+
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 @Embeddable
@@ -11,13 +14,11 @@ import lombok.Data;
 public class UserSubscriptionId implements Serializable {
 	private static final long serialVersionUID = 3838752332485857554L;
 
-	@Column(name = "user_id")
-    private Long userId;
+	@ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserDetails user;
 
-    @Column(name = "newspaper_id")
-    private Long newspaperId;
-
-    @Column(name = "location_id")
-    private Long locationId;
-
+	@ManyToOne
+    @JoinColumn(name = "newspaper_id")
+    private Vendor newspaper;
 }

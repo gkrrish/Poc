@@ -85,5 +85,7 @@ INSERT INTO USER_STATUS (
 );
 
 
+INSERT INTO USER_NEWSPAPER_SUBSCRIPTION (user_id, newspaper_master_id, subscriptiontypeid, subscription_start_date, subscription_end_date)
+VALUES (1, 1, 2, TO_DATE('2024-05-15', 'YYYY-MM-DD'), TO_DATE('2024-06-14', 'YYYY-MM-DD'));
 
 

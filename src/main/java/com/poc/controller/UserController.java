@@ -20,48 +20,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.poc.customeinvoice.InvoiceCustomPDFService;
 import com.poc.entity.UserDetails;
-import com.poc.pdfservice.PdfService;
 import com.poc.request.WelcomeRequest;
 import com.poc.response.ExistingUserDetails;
-import com.poc.response.WelcomeResponse;
 import com.poc.service.UserService;
-import com.poc.util.StringUtils;
 
 @RestController
 public class UserController {
 
 	@Autowired
 	private UserService userService;
-	@Autowired
-	private PdfService pdfService;
 
 	@PostMapping("/welcome") // fake charges?
 	@ResponseStatus
-	public ResponseEntity<?> welcomeUser(@RequestBody WelcomeRequest request) {
-		ExistingUserDetails existingUserDetails = userService.getSubscriptioinDetails(request.getMobileNumber());
-
-		if (existingUserDetails.getMobileNumber().isEmpty() || existingUserDetails.getMobileNumber().isBlank()) {
-			WelcomeResponse welcomeResponse = new WelcomeResponse(StringUtils.WELCOME_MESSAGE);
-			List<String> languages = userService.getAllLanguges();
-			welcomeResponse.setLanguages(languages);
-
-			return ResponseEntity.ok(welcomeResponse);
-
-		} else {
-			byte[] invoice = null;
-			try {
-				invoice = pdfService.generateInvoice(existingUserDetails);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_PDF);
-			headers.setContentDispositionFormData("attachment", "invoice.pdf");
-
-			return new ResponseEntity<>(invoice, headers, HttpStatus.OK);
-
-		}
+	public ResponseEntity<?> welcomeUser(@RequestBody WelcomeRequest request) throws IOException {
+		return userService.processWelcomeRequest(request);
 	}
 
 	@GetMapping("/states/{mobileNumber}")
@@ -95,7 +67,7 @@ public class UserController {
 		}
 	}
 	
-	@GetMapping("/test")
+	@GetMapping("/custompdfinvoice")
 	public ResponseEntity<?> getTest() throws FileNotFoundException {
 		ExistingUserDetails existingUserDetails = userService.getSubscriptioinDetails("+919876543210");
 		InvoiceCustomPDFService general=new InvoiceCustomPDFService();

@@ -69,7 +69,7 @@ CREATE TABLE MASTER_BATCH_JOBS (
 CREATE TABLE SUBSCRIPTION_TYPE (
   subscriptiontypeid INT PRIMARY KEY,
   subscriptiontype VARCHAR2(10) CHECK (subscriptiontype IN ('FREE', 'PAID')),
-  subscriptionduration VARCHAR2(10),
+  subscriptionduration VARCHAR2(10) CHECK (subscriptionduration IN ('1 MONTH', '3 MONTHS', '6 MONTHS', '12 MONTHS')),
   subscriptionfee DECIMAL(10, 2) CHECK (subscriptionfee >= 0),
   CONSTRAINT chk_subscription_type_fee CHECK (
     (UPPER(subscriptiontype) = 'FREE' AND subscriptionfee = 0) OR
@@ -92,22 +92,26 @@ CREATE TABLE VENDOR_DETAILS (
 );
 
 ==================================BASIC VENDOR DETAILS Completed==========================================================
-
+CREATE TABLE MASTER_NEWSPAPER (
+    newspaper_master_id INT PRIMARY KEY,
+    newspaper_name VARCHAR2(100) UNIQUE,
+    vendor_id INT,
+    FOREIGN KEY (vendor_id) REFERENCES VENDOR_DETAILS(vendorid)
+);
 
 CREATE TABLE VENDORS (
     newspaper_id INT PRIMARY KEY,
     location_id INT,
-    newspaper_name VARCHAR2(100),
+    newspaper_master_id INT,
     newspaper_language INT,
     subscription_type_id INT,
     category_id INT,
     publication_type VARCHAR2(10) CHECK (publication_type IN ('Newspaper', 'Magazine')),
-    vendor_id INT, 
-
+    
     FOREIGN KEY (location_id) REFERENCES MASTER_STATEWISE_LOCATIONS(location_id),
+    FOREIGN KEY (newspaper_master_id) REFERENCES MASTER_NEWSPAPER(newspaper_master_id),
     FOREIGN KEY (newspaper_language) REFERENCES MASTER_NEWS_LANGUAGES(language_id),
     FOREIGN KEY (subscription_type_id) REFERENCES SUBSCRIPTION_TYPE(subscriptiontypeid),
-    FOREIGN KEY (vendor_id) REFERENCES VENDOR_DETAILS(vendorid),
     FOREIGN KEY (category_id) REFERENCES MASTER_CATEGORY_TYPE(category_id)
 );
 
@@ -121,21 +125,39 @@ CREATE TABLE NEWSPAPER_FILES (
 );
 
 =================================NEWS PAPER FILE LOCATION COMPLETED===========================================================
+CREATE TABLE USER_NEWSPAPER_SUBSCRIPTION (
+    user_id INT,
+    newspaper_master_id INT,
+    subscriptiontypeid INT,
+    subscription_start_date DATE,
+    subscription_end_date DATE,
+    PRIMARY KEY (user_id, newspaper_master_id),
+    FOREIGN KEY (user_id) REFERENCES USER_DETAILS(UserID),
+    FOREIGN KEY (newspaper_master_id) REFERENCES MASTER_NEWSPAPER(newspaper_master_id),
+    FOREIGN KEY (subscriptiontypeid) REFERENCES SUBSCRIPTION_TYPE(subscriptiontypeid)
+);
+
 
 CREATE TABLE USER_SUBSCRIPTION (
     user_id INT,
     newspaper_id INT,
     batch_id NUMBER,
-    user_eligible NUMBER(1,0) DEFAULT 1,
-    location_id INT,
     
-    CONSTRAINT PK_UX_USER_SUBSCRIPTION PRIMARY KEY (user_id, newspaper_id, location_id),
+    CONSTRAINT PK_UX_USER_SUBSCRIPTION PRIMARY KEY (user_id, newspaper_id),
     FOREIGN KEY (user_id) REFERENCES USER_DETAILS(UserID),
-    FOREIGN KEY (newspaper_id) REFERENCES VENDORS(newspaper_id), 
-    FOREIGN KEY (location_id) REFERENCES MASTER_STATEWISE_LOCATIONS(location_id),
-    FOREIGN KEY (batch_id) REFERENCES MASTER_BATCH_JOBS(BATCH_ID) 
+    FOREIGN KEY (newspaper_id) REFERENCES VENDORS(newspaper_id),
+    FOREIGN KEY (batch_id) REFERENCES MASTER_BATCH_JOBS(BATCH_ID)
 );
 
+CREATE TABLE USER_STATUS (
+    UserID NUMBER(10),
+    ValidateWhatsAppUser CHAR(1) CHECK (ValidateWhatsAppUser IN ('Y', 'N')),
+    Blocked CHAR(1) CHECK (Blocked IN ('Y', 'N')),
+    Active CHAR(1) CHECK (Active IN ('Y', 'N')),--rename this field after actully Active looking 2 times, another one is userdeatils also looking
+    NotReachable CHAR(1) CHECK (NotReachable IN ('Y', 'N')),
+    PRIMARY KEY (UserID),
+    FOREIGN KEY (UserID) REFERENCES USER_DETAILS(UserID)
+);
 =============================================================================================================================
 
 -- Create the function generate_location_name in PL/SQL
@@ -163,12 +185,66 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Location Name: ' || loc_name);
 END;
 ===================================================================================================================================
-CREATE TABLE USER_STATUS (
-    UserID NUMBER(10),
-    ValidateWhatsAppUser CHAR(1) CHECK (ValidateWhatsAppUser IN ('Y', 'N')),
-    Blocked CHAR(1) CHECK (Blocked IN ('Y', 'N')),
-    Active CHAR(1) CHECK (Active IN ('Y', 'N')),
-    NotReachable CHAR(1) CHECK (NotReachable IN ('Y', 'N')),
-    PRIMARY KEY (UserID),
-    FOREIGN KEY (UserID) REFERENCES USER_DETAILS(UserID)
-);
+
+CREATE OR REPLACE FUNCTION calculate_prorated_fee(
+  subscriptiontypeid IN INT,
+  start_date IN DATE,
+  end_date IN DATE
+) RETURN DECIMAL IS
+  fee DECIMAL(10, 2);
+  prorated_fee DECIMAL(10, 2);
+  days_in_month INT;
+  subscription_days INT;
+BEGIN
+  SELECT subscriptionfee INTO fee
+  FROM SUBSCRIPTION_TYPE
+  WHERE subscriptiontypeid = subscriptiontypeid;
+
+  days_in_month := TO_NUMBER(TO_CHAR(LAST_DAY(start_date), 'DD'));
+  subscription_days := end_date - start_date + 1;
+  prorated_fee := (fee / days_in_month) * subscription_days;
+
+  RETURN prorated_fee;
+END;
+
+======================================================================================================================================
+testing the above function
+
+-- Enable DBMS_OUTPUT
+SET SERVEROUTPUT ON;
+
+DECLARE
+    prorated_fee DECIMAL(10, 2);
+    start_date DATE := SYSDATE;
+    end_date DATE := ADD_MONTHS(SYSDATE, 1) - 1; -- Example: one month subscription
+    existing_subscription_count INT;
+BEGIN
+    -- Check if the user already subscribed to the same newspaper
+    SELECT COUNT(*)
+    INTO existing_subscription_count
+    FROM USER_NEWSPAPER_SUBSCRIPTION
+    WHERE user_id = 1 AND newspaper_master_id = 1;
+
+    IF existing_subscription_count = 0 THEN
+        -- Calculate the subscription fee
+        prorated_fee := calculate_prorated_fee(1, start_date, end_date);
+
+        -- Insert into USER_NEWSPAPER_SUBSCRIPTION
+        INSERT INTO USER_NEWSPAPER_SUBSCRIPTION (
+            user_id, newspaper_master_id, subscriptiontypeid, subscription_start_date, subscription_end_date
+        ) VALUES (
+            1, 1, 2, start_date, end_date
+        );
+
+        -- Print subscription details
+        DBMS_OUTPUT.PUT_LINE('Subscription inserted successfully.');
+        DBMS_OUTPUT.PUT_LINE('User ID: 1');
+        DBMS_OUTPUT.PUT_LINE('Newspaper Master ID: 1');
+        DBMS_OUTPUT.PUT_LINE('Subscription Type ID: 2');
+        DBMS_OUTPUT.PUT_LINE('Subscription Start Date: ' || TO_CHAR(start_date, 'YYYY-MM-DD'));
+        DBMS_OUTPUT.PUT_LINE('Subscription End Date: ' || TO_CHAR(end_date, 'YYYY-MM-DD'));
+        DBMS_OUTPUT.PUT_LINE('Prorated Fee: ' || prorated_fee);
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('User is already subscribed to this newspaper.');
+    END IF;
+END;

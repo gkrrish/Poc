@@ -6,8 +6,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.itextpdf.io.IOException;
 import com.poc.entity.UserDetails;
 import com.poc.master.entity.Country;
 import com.poc.master.entity.State;
@@ -16,9 +21,13 @@ import com.poc.master.repository.DistrictRepository;
 import com.poc.master.repository.IndianNewspaperLanguageRepository;
 import com.poc.master.repository.MandalRepository;
 import com.poc.master.repository.StateRepository;
+import com.poc.pdfservice.PdfService;
 import com.poc.repository.UserDetailsRepository;
-import com.poc.response.UserDetailsResponse;
+import com.poc.request.WelcomeRequest;
 import com.poc.response.ExistingUserDetails;
+import com.poc.response.UserDetailsResponse;
+import com.poc.response.WelcomeResponse;
+import com.poc.util.StringUtils;
 
 @Service
 public class UserService {
@@ -35,6 +44,8 @@ public class UserService {
 	private DistrictRepository districtRepository;
 	@Autowired
 	private MandalRepository mandalRepository;
+	@Autowired
+	private PdfService pdfService;
 
 	public List<String> getAllLanguges() {
 		List<String> allLanguageNames = languageRepository.findAllLanguageNames();
@@ -67,9 +78,7 @@ public class UserService {
 
         existingUserDetails.setDetails(detailsList);
 
-        double totalSubscriptionCharges = detailsList.stream()
-        		.mapToDouble(details -> details.getSubscriptionCharges().doubleValue()) 
-                .sum();
+        double totalSubscriptionCharges = detailsList.stream().mapToDouble(details -> details.getSubscriptionCharges().doubleValue()).sum();
         existingUserDetails.setTotalSubscriptionCharges(totalSubscriptionCharges);
         
         return existingUserDetails;
@@ -98,7 +107,34 @@ public class UserService {
         }).collect(Collectors.toList());
 	}
 
-	
+	public ResponseEntity<?> processWelcomeRequest(WelcomeRequest request) throws java.io.IOException {
+        ExistingUserDetails existingUserDetails = getSubscriptioinDetails(request.getMobileNumber());
+
+        if (existingUserDetails.getMobileNumber().isEmpty() || existingUserDetails.getMobileNumber().isBlank()) {
+            return generateWelcomeResponse();
+        } else {
+            return generateInvoiceResponse(existingUserDetails);
+        }
+    }
+
+    private ResponseEntity<?> generateWelcomeResponse() {
+        WelcomeResponse welcomeResponse = new WelcomeResponse(StringUtils.WELCOME_MESSAGE);
+        welcomeResponse.setLanguages(getAllLanguges());
+        return ResponseEntity.ok(welcomeResponse);
+    }
+
+    private ResponseEntity<?> generateInvoiceResponse(ExistingUserDetails existingUserDetails) throws java.io.IOException {
+        try {
+            byte[] invoice = pdfService.generateInvoice(existingUserDetails);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "invoice.pdf");
+            return new ResponseEntity<>(invoice, headers, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle the exception properly, maybe return an error response
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to generate invoice");
+        }
+    }
 
 
 }

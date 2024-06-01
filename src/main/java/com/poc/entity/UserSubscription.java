@@ -1,6 +1,6 @@
 package com.poc.entity;
 
-import com.poc.master.entity.StatewiseLocation;
+import com.poc.master.entity.BatchJob;
 import com.poc.master.entity.Vendor;
 
 import jakarta.persistence.Column;
@@ -8,6 +8,7 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -28,12 +29,10 @@ public class UserSubscription {
 	private Vendor vendor;
 
 	@ManyToOne
-	@JoinColumn(name = "location_id", insertable = false, updatable = false)
-	private StatewiseLocation location;
+	@MapsId("batchId")
+	@JoinColumn(name = "batch_id")
+	private BatchJob batch;
 
-	@Column(name = "batch_id", insertable = false, updatable = false)
-	private Long batchId;
-
-	@Column(name = "user_eligible")
-	private boolean userEligible;
+	@Column(name = "user_eligible", columnDefinition = "NUMBER(1,0) DEFAULT 1")
+	private Boolean userEligible = true;
 }
