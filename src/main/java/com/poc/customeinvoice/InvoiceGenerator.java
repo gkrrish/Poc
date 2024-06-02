@@ -124,7 +124,7 @@ public class InvoiceGenerator {
 		document.add(threeColTable1);
 	}
 
-	//Billing and Adress Template design
+	//Billing and Address Template design
 	public void createAddress(AddressDetails addressDetails) {
 		 // Step 1: Create a Table with Two Columns
 		Table twoColTable = new Table(twocolumnWidth);
@@ -155,6 +155,7 @@ public class InvoiceGenerator {
 	}
 
 	public void createHeader(HeaderDetails header) {
+		 // Step 1: Create a Table with Two Columns
 		Table table = new Table(twocolumnWidth);
 		table.addCell(new Cell().add(new Paragraph(header.getInvoiceTitle())).setFontSize(20f)
 				.setBorder(Border.NO_BORDER).setBold());

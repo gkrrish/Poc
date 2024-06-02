@@ -79,5 +79,27 @@ public class UserController {
 
 		return new ResponseEntity<>(customePDF, headers, HttpStatus.OK);
 	}
+	
+	@GetMapping("/generate")
+    public ResponseEntity<byte[]> generatePdf() {
+        byte[] pdfContent = userService.createPdf();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "inline; filename=vehicle_idv.pdf");
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .headers(headers)
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .body(pdfContent);
+    }
+    @GetMapping("/generatex")
+    public ResponseEntity<?> getTestx() {
+    	byte[] pdfContent = userService.createPdf();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "test.pdf");
+
+        return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
+    }
 
 }
