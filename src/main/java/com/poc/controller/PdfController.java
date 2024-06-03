@@ -47,6 +47,9 @@ public class PdfController {
             // Add dummy subscription data
             List<NewspaperSubscription> subscriptions = new ArrayList<>();
             subscriptions.add(new NewspaperSubscription("Eenadu","Telugu","Telangana","Hyderabad", "Gopalpet", "04:00 AM", 80));
+            subscriptions.add(new NewspaperSubscription("Eenadu","Telugu","Telangana","Hyderabad", "Gopalpet", "04:00 AM", 80));
+            subscriptions.add(new NewspaperSubscription("Eenadu","Telugu","Telangana","Hyderabad", "Gopalpet", "04:00 AM", 80));
+            
             invoice.setSubscriptions(subscriptions);
 
             // Add dummy payment details

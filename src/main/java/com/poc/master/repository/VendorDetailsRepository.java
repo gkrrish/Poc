@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import com.poc.master.entity.VendorDetails;
 
 @Repository
-public interface VendorDetailsRepository extends JpaRepository<VendorDetails, Long> {
+public interface VendorDetailsRepository extends JpaRepository<VendorDetails, Integer> {
 }
