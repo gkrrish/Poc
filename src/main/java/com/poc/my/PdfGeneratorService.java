@@ -24,6 +24,7 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.UnitValue;
+import com.itextpdf.layout.property.VerticalAlignment;
 
 @Service
 public class PdfGeneratorService {
@@ -80,29 +81,71 @@ public class PdfGeneratorService {
         ImageData imgData = ImageDataFactory.create(imagePath);
         Image img = new Image(imgData);
         document.add(img);
-        document.add(new Paragraph());
     }
 
     private void addInvoiceDetails(Document document, Invoice invoice) {
-        PdfFont latoLight = fontLight;
-
-        Paragraph invoiceTitle = new Paragraph("INVOICE TO: \n").setFont(latoLight).setFontSize(8).setTextAlignment(TextAlignment.LEFT);
-        invoiceTitle.add(invoice.getInvoiceTo()).setFont(fontMedium).setFontSize(13.5f).setBold().setTextAlignment(TextAlignment.LEFT);
-        invoiceTitle.setFixedLeading(18f);
+        // Invoice title and recipient name
+        Paragraph invoiceTitle = new Paragraph("INVOICE TO: \n")
+                .setFont(fontLight)
+                .setFontSize(10)
+                .setTextAlignment(TextAlignment.LEFT);
+        invoiceTitle.setFixedLeading(13f);
+        invoiceTitle.add(new Paragraph(invoice.getInvoiceTo())
+                .setFont(fontMedium)
+                .setFontSize(12.5f)
+                .setBold()
+                .setTextAlignment(TextAlignment.LEFT));
+        invoiceTitle.setFixedLeading(14f);  // Adjusted fixed leading
         document.add(invoiceTitle);
 
-        Table invoiceDetailsTable = new Table(UnitValue.createPointArray(new float[]{300f, 350f}));
-        invoiceDetailsTable.setBorder(Border.NO_BORDER);
+        // Left details
+        Paragraph leftDetails = new Paragraph();
+        leftDetails.add(new Paragraph("Mobile number   : " + invoice.getMobileNumber()).setFont(fontLight).setFontSize(10)).setFixedLeading(12f);
+        leftDetails.add(new Paragraph("Email           : " + invoice.getEmail()).setFont(fontLight).setFontSize(10)).setFixedLeading(12f);
+        leftDetails.add(new Paragraph("Contact Details : " + padRight(invoice.getContactDetails(), 30)).setFont(fontLight).setFontSize(10)).setFixedLeading(12f);
 
-        invoiceDetailsTable.addCell(createDetailParagraph("Mobile Number: ", invoice.getMobileNumber()));
-        invoiceDetailsTable.addCell(createDetailParagraph("TOTAL DUE: ", invoice.getTotalDue())).setTextAlignment(TextAlignment.RIGHT);
-        invoiceDetailsTable.addCell(createDetailParagraph("Email: ", invoice.getEmail()));
-        invoiceDetailsTable.addCell(createDetailParagraph("Invoice No: ", invoice.getInvoiceNo())).setTextAlignment(TextAlignment.RIGHT);
-        invoiceDetailsTable.addCell(createDetailParagraph("Contact Details: ", invoice.getContactDetails()));
-        invoiceDetailsTable.addCell(createDetailParagraph("Date: ", invoice.getDate())).setTextAlignment(TextAlignment.RIGHT);
+        // Right details
+        Paragraph rightDetails = new Paragraph();
+        rightDetails.add(new Paragraph("TOTAL DUE")
+                .setFont(fontMedium)
+                .setFontSize(8.9f)
+                .setBold()
+                .setTextAlignment(TextAlignment.RIGHT))
+                .setBorder(Border.NO_BORDER);
+        rightDetails.add(new Paragraph(String.valueOf(invoice.getTotalDue()))
+                .setFont(fontMedium)
+                .setFontSize(13.5f)
+                .setBold()
+                .setTextAlignment(TextAlignment.RIGHT)
+                .setMarginTop(-3));  // Ensure the amount comes below the "TOTAL DUE" text
+        rightDetails.add(new Paragraph("Invoice No: " + padRight(invoice.getInvoiceNo(), 20))
+                .setFont(fontLight)
+                .setFontSize(10)
+                .setTextAlignment(TextAlignment.RIGHT)).setFixedLeading(12f);  // Ensure minimum 20 characters
+        rightDetails.add(new Paragraph("Date: " + padRight(invoice.getDate(), 20))
+                .setFont(fontLight)
+                .setFontSize(10)
+                .setTextAlignment(TextAlignment.RIGHT)).setFixedLeading(12f);  // Ensure minimum 20 characters
 
-        document.add(invoiceDetailsTable);
+        // Combine left and right details in a single row
+        Table combinedTable = new Table(new float[]{1, 1});
+        combinedTable.setWidth(UnitValue.createPercentValue(100));
+        combinedTable.setBorder(Border.NO_BORDER);
+
+        combinedTable.addCell(new Cell().add(leftDetails).setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.TOP));
+        combinedTable.addCell(new Cell().add(rightDetails)
+                .setBorder(Border.NO_BORDER)
+                .setTextAlignment(TextAlignment.RIGHT)
+                .setVerticalAlignment(VerticalAlignment.TOP)
+                .setPaddingRight(20));  // Add 30px space from the right border
+
+        document.add(combinedTable);
     }
+
+    private String padRight(String text, int length) {
+        return String.format("%-" + length + "s", text);
+    }
+
 
    
 
@@ -158,12 +201,6 @@ public class PdfGeneratorService {
         }
     }
     
-    private Paragraph createDetailParagraph(String label, double totalDue) {
-    	return new Paragraph().add(label + totalDue)
-                .setFont(fontLight)
-                .setFontSize(10);
-	}
-
 	private Paragraph createDetailParagraph(String label, String value) {
         return new Paragraph().add(label + value)
                 .setFont(fontLight)
