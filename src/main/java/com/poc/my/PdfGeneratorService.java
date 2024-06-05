@@ -15,11 +15,13 @@ import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.TextAlignment;
+import com.itextpdf.layout.property.UnitValue;
 
 @Service
 public class PdfGeneratorService {
@@ -30,32 +32,82 @@ public class PdfGeneratorService {
 		PdfWriter writer = new PdfWriter(out);
 		PdfDocument pdfDoc = new PdfDocument(writer);
 		Document document = new Document(pdfDoc);
+		float leftMargin = 12; 
+		float rightMargin = 12;
+		float topMargin = 20;
+		float bottomMargin = 1;
 		pdfDoc.setDefaultPageSize(PageSize.A4);
+		document.setMargins(topMargin, rightMargin, bottomMargin, leftMargin);
 		
 		// Load custom fonts
         String poppinsMedium = "D:\\FontsFree-Net-Poppins-Medium.ttf"; 
         String poppinsLight = "D:\\FontsFree-Net-Poppins-Light.ttf"; 
+        String latoLightFont = "D:\\Lato-Light.ttf";
         PdfFont fontMedium = PdfFontFactory.createFont(poppinsMedium, PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED);
         PdfFont fontLight = PdfFontFactory.createFont(poppinsLight, PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED);
+        PdfFont latoLight = PdfFontFactory.createFont(latoLightFont, PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED);
 
 		// Add header image
 		String headerImgPath = "D:\\invoicelogo.jpg";
 		ImageData headerImgData = ImageDataFactory.create(headerImgPath);
 		Image headerImg = new Image(headerImgData);
+//		headerImg.setWidth(570);
+//		headerImg.setHeight(90);
 		document.add(headerImg);
-
-		// Add Invoice details
-        document.add(new Paragraph("TAX INVOICE").setBold().setFontSize(14).setFont(fontMedium));
-        document.add(new Paragraph("INVOICE TO: " + invoice.getInvoiceTo()).setFont(fontLight).setFontSize(10));
+		document.add(new Paragraph());
+		
+		// Add header image
+		String invoiceHeadingPath = "D:\\invoiceheading.PNG";
+		ImageData invoiceHeadingImgData = ImageDataFactory.create(invoiceHeadingPath);
+		Image invoiceHeadingImg = new Image(invoiceHeadingImgData);
+		invoiceHeadingImg.setWidth(580);
+		document.add(invoiceHeadingImg);
+		
+		
+		 
+		Paragraph invoiceTitle = new Paragraph("INVOICE TO: \n").setFont(latoLight).setFontSize(8).setTextAlignment(TextAlignment.LEFT);
+		invoiceTitle.add(invoice.getInvoiceTo()).setFont(fontMedium).setFontSize(13.5f).setBold().setTextAlignment(TextAlignment.LEFT);
+		invoiceTitle.setTextAlignment(TextAlignment.LEFT);
+		invoiceTitle.setFixedLeading(18f);
+		document.add(invoiceTitle);
+		
+	    Paragraph invoiceParagraphLeft=new Paragraph();
+	    invoiceParagraphLeft.add("Mobile Number: " + invoice.getMobileNumber()).setFont(fontLight).setFontSize(10);
+	    invoiceParagraphLeft.add("Email: " + invoice.getEmail()).setFont(fontLight).setFontSize(10);
+	    invoiceParagraphLeft.add("Contact Details: " + invoice.getContactDetails()).setFont(fontLight).setFontSize(10);
+	    invoiceParagraphLeft.add("Date: " + invoice.getDate()).setFont(fontLight).setFontSize(10);
+		
+	    Paragraph invoiceParagraphRight=new Paragraph();
+	    invoiceParagraphRight.add("TOTAL DUE: " + invoice.getTotalDue()).setFont(fontLight).setFontSize(10);
+	    invoiceParagraphRight.add("Invoice No: " + invoice.getInvoiceNo()).setFont(fontLight).setFontSize(10);
+	    invoiceParagraphRight.add("Date: " + invoice.getDate()).setFont(fontLight).setFontSize(10);
+	    
+	    Table tablex = new Table(UnitValue.createPointArray(new float[]{300f, 3500f}));
+	    tablex.addCell(invoiceParagraphLeft);
+	    tablex.addCell(invoiceParagraphRight).setTextAlignment(TextAlignment.RIGHT);
+	    tablex.setBorder(Border.NO_BORDER);
+	    tablex.setBorderTop(Border.NO_BORDER);
+	    tablex.setBorderBottom(Border.NO_BORDER);
+	    tablex.setBorderLeft(Border.NO_BORDER);
+	    tablex.setBorderRight(Border.NO_BORDER);
+	    
+	    document.add(tablex);
+	    
+	    Paragraph newspaperSubscriptionParagraph = new Paragraph("News Paper Subscriptions :").setFontSize(9).setFont(fontLight);
+	    newspaperSubscriptionParagraph.setFixedLeading(10f);
+	    document.add(newspaperSubscriptionParagraph);
+	    
+		
+		/*// Add Invoice details
         document.add(new Paragraph("Mobile Number: " + invoice.getMobileNumber()).setFont(fontLight).setFontSize(10));
         document.add(new Paragraph("Email: " + invoice.getEmail()).setFont(fontLight).setFontSize(10));
         document.add(new Paragraph("Contact Details: " + invoice.getContactDetails()).setFont(fontLight).setFontSize(10));
         document.add(new Paragraph("Date: " + invoice.getDate()).setFont(fontLight).setFontSize(10));
         document.add(new Paragraph("TOTAL DUE: " + invoice.getTotalDue()).setFont(fontLight).setFontSize(10));
-        document.add(new Paragraph("Invoice No: " + invoice.getInvoiceNo()).setFont(fontLight).setFontSize(10));
+        document.add(new Paragraph("Invoice No: " + invoice.getInvoiceNo()).setFont(fontLight).setFontSize(10)); */
 
 		// Add Table
-		float[] columnWidths = { 100F, 80F, 100F, 100F, 50F, 150F, 250F };
+		float[] columnWidths = { 110F, 80F, 100F, 100F, 100F, 150F, 250F };
 		Table table = new Table(columnWidths);
         
 		// Header row with black background and white text
@@ -69,13 +121,13 @@ public class PdfGeneratorService {
 
 
 		for (NewspaperSubscription subscription : invoice.getSubscriptions()) {
-			table.addCell(new Cell().add(new Paragraph(subscription.getNewspaper()).setFont(fontLight).setFontSize(10))).setFontColor(ColorConstants.BLACK);
-			table.addCell(new Cell().add(new Paragraph(subscription.getLanguage()).setFont(fontLight).setFontSize(10))).setFontColor(ColorConstants.BLACK);
-			table.addCell(new Cell().add(new Paragraph(subscription.getState()).setFont(fontLight).setFontSize(10))).setFontColor(ColorConstants.BLACK);
-			table.addCell(new Cell().add(new Paragraph(subscription.getDistrict()).setFont(fontLight).setFontSize(10))).setFontColor(ColorConstants.BLACK);
-            table.addCell(new Cell().add(new Paragraph(subscription.getMandal()).setFont(fontLight).setFontSize(10))).setFontColor(ColorConstants.BLACK);
-            table.addCell(new Cell().add(new Paragraph(subscription.getScheduledTime()).setFont(fontLight).setFontSize(10))).setFontColor(ColorConstants.BLACK);
-            table.addCell(new Cell().add(new Paragraph(String.valueOf(subscription.getMonthlySubscription())).setFont(fontLight).setFontSize(10))).setFontColor(ColorConstants.BLACK);
+			table.addCell(new Cell().add(new Paragraph(subscription.getNewspaper()).setFont(fontLight).setFontSize(10f))).setTextAlignment(TextAlignment.CENTER).setFontColor(ColorConstants.BLACK);
+			table.addCell(new Cell().add(new Paragraph(subscription.getLanguage()).setFont(fontLight).setFontSize(10f))).setTextAlignment(TextAlignment.CENTER).setFontColor(ColorConstants.BLACK);
+			table.addCell(new Cell().add(new Paragraph(subscription.getState()).setFont(fontLight).setFontSize(10f))).setTextAlignment(TextAlignment.CENTER).setFontColor(ColorConstants.BLACK);
+			table.addCell(new Cell().add(new Paragraph(subscription.getDistrict()).setFont(fontLight).setFontSize(10f))).setTextAlignment(TextAlignment.CENTER).setFontColor(ColorConstants.BLACK);
+            table.addCell(new Cell().add(new Paragraph(subscription.getMandal()).setFont(fontLight).setFontSize(10f))).setTextAlignment(TextAlignment.CENTER).setFontColor(ColorConstants.BLACK);
+            table.addCell(new Cell().add(new Paragraph(subscription.getScheduledTime()).setFont(fontLight).setFontSize(10f))).setTextAlignment(TextAlignment.CENTER).setFontColor(ColorConstants.BLACK);
+            table.addCell(new Cell().add(new Paragraph(String.valueOf(subscription.getMonthlySubscription())).setFont(fontLight).setFontSize(10))).setTextAlignment(TextAlignment.CENTER).setFontColor(ColorConstants.BLACK);
 		}
 		document.add(table);
 		// Add Sub-total and Total
