@@ -11,9 +11,9 @@ import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.property.TextAlignment;
-import com.poc.response.UserDetailsResponse;
+import com.itextpdf.layout.properties.TextAlignment;
 import com.poc.response.ExistingUserDetails;
+import com.poc.response.UserDetailsResponse;
 import com.poc.util.PDFReportUtils;
 
 
