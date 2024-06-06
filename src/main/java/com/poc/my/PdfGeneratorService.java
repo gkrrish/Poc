@@ -191,41 +191,45 @@ public class PdfGeneratorService {
 
     private void addInvoiceSummary(Document document, Invoice invoice) {
         // Table for the summary and payment details
-        float[] columnWidths = {1, 1};
+        float[] columnWidths = {4, 2}; // Two equal columns
         Table table = new Table(UnitValue.createPercentArray(columnWidths));
-        table.setWidth(UnitValue.createPercentValue(50));
-        table.setTextAlignment(TextAlignment.RIGHT);
+        table.setWidth(UnitValue.createPercentValue(30)); // Adjust table width as needed
+        table.setTextAlignment(TextAlignment.CENTER);
         table.setHorizontalAlignment(HorizontalAlignment.RIGHT);
-        table.setMarginTop(10); // Adjust margin as needed
+//        table.setMarginTop(10); // Adjust margin as needed
 
-        // Subtotal and Total cells
-        Cell subtotalCell = new Cell().add(new Paragraph("Subtotal: " + invoice.getTotalDue())
-                .setFont(fontMedium)
-                .setFontSize(10)
-                .setTextAlignment(TextAlignment.RIGHT)
-                .setMarginRight(30)); // Adjust margin as needed
-        subtotalCell.setBorder(new SolidBorder(1));
-        
-        Cell taxCell = new Cell().add(new Paragraph("Tax: " + invoice.getTotalDue())
-                .setFont(fontMedium)
-                .setFontSize(10)
-                .setTextAlignment(TextAlignment.RIGHT)
-                .setMarginRight(30)); // Adjust margin as needed
-        subtotalCell.setBorder(new SolidBorder(1));
+        // Subtotal row
+        table.addCell(createSummaryCell("Subtotal:"));
+        table.addCell(createSummaryValueCell(String.valueOf(invoice.getTotalDue())));
 
-        Cell totalCell = new Cell().add(new Paragraph("Total: " + invoice.getTotalDue())
-                .setFont(fontMedium)
-                .setFontSize(10)
-                .setTextAlignment(TextAlignment.RIGHT)
-                .setMarginRight(30)); // Adjust margin as needed
-        totalCell.setBorder(new SolidBorder(1));
+        // Tax row
+        table.addCell(createSummaryCell("Tax:"));
+        table.addCell(createSummaryValueCell(String.valueOf(invoice.getTotalDue())));
 
-        table.addCell(subtotalCell);
-        table.addCell(taxCell);
-        table.addCell(totalCell);
+        // Total row
+        table.addCell(createSummaryCell("Total:"));
+        table.addCell(createSummaryValueCell(String.valueOf(invoice.getTotalDue())));
 
         // Add the table to the document
         document.add(table);
+    }
+
+    private Cell createSummaryCell(String text) {
+        return new Cell()
+                .add(new Paragraph(text)
+                        .setFont(fontMedium)
+                        .setFontSize(10)
+                        .setTextAlignment(TextAlignment.CENTER))
+                .setBorder(new SolidBorder(0));
+    }
+
+    private Cell createSummaryValueCell(String text) {
+        return new Cell()
+                .add(new Paragraph(text)
+                        .setFont(fontMedium)
+                        .setFontSize(10)
+                        .setTextAlignment(TextAlignment.CENTER))
+                .setBorder(new SolidBorder(0));
     }
 
     private void addPaymentDetails(Document document, Invoice invoice) {
