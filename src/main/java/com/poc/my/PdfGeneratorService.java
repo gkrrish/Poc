@@ -16,12 +16,15 @@ import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
+import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.UnitValue;
 import com.itextpdf.layout.property.VerticalAlignment;
@@ -55,13 +58,17 @@ public class PdfGeneratorService {
         addPaymentDetails(document, invoice);
         
         addFooterImage(document, "D:\\invoicelogo.jpg");
+        
+        addThanksAndSignature(document, invoice);
+        
         addFooterText(document);
         
         document.close();
         return new ByteArrayInputStream(out.toByteArray());
     }
 
-    private void setupDocument(Document document, PdfDocument pdfDoc) {
+
+	private void setupDocument(Document document, PdfDocument pdfDoc) {
         float leftMargin = 12;
         float rightMargin = 12;
         float topMargin = 20;
@@ -101,23 +108,25 @@ public class PdfGeneratorService {
         // Left details
         Paragraph leftDetails = new Paragraph();
         leftDetails.add(new Paragraph("Mobile number   : " + invoice.getMobileNumber()).setFont(fontLight).setFontSize(10)).setFixedLeading(12f);
+        leftDetails.add(new Paragraph());
         leftDetails.add(new Paragraph("Email           : " + invoice.getEmail()).setFont(fontLight).setFontSize(10)).setFixedLeading(12f);
         leftDetails.add(new Paragraph("Contact Details : " + padRight(invoice.getContactDetails(), 30)).setFont(fontLight).setFontSize(10)).setFixedLeading(12f);
 
         // Right details
         Paragraph rightDetails = new Paragraph();
-        rightDetails.add(new Paragraph("TOTAL DUE")
+        rightDetails.add(new Paragraph("TOTAL DUE   \n\n")
                 .setFont(fontMedium)
                 .setFontSize(8.9f)
                 .setBold()
                 .setTextAlignment(TextAlignment.RIGHT))
                 .setBorder(Border.NO_BORDER);
+        rightDetails.add(new Paragraph());
         rightDetails.add(new Paragraph(String.valueOf(invoice.getTotalDue()))
                 .setFont(fontMedium)
                 .setFontSize(13.5f)
                 .setBold()
                 .setTextAlignment(TextAlignment.RIGHT)
-                .setMarginTop(-3));  // Ensure the amount comes below the "TOTAL DUE" text
+                .setMarginTop(-10));  // Ensure the amount comes below the "TOTAL DUE" text
         rightDetails.add(new Paragraph("Invoice No: " + padRight(invoice.getInvoiceNo(), 20))
                 .setFont(fontLight)
                 .setFontSize(10)
@@ -181,31 +190,82 @@ public class PdfGeneratorService {
     }
 
     private void addInvoiceSummary(Document document, Invoice invoice) {
-        addRightAlignedParagraph(document, "Subtotal: " + invoice.getTotalDue(), fontMedium, 10);
-        addRightAlignedParagraph(document, "Total: " + invoice.getTotalDue(), fontMedium, 10);
-    }
+        // Table for the summary and payment details
+        float[] columnWidths = {1, 1};
+        Table table = new Table(UnitValue.createPercentArray(columnWidths));
+        table.setWidth(UnitValue.createPercentValue(50));
+        table.setTextAlignment(TextAlignment.RIGHT);
+        table.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+        table.setMarginTop(10); // Adjust margin as needed
 
-    private void addRightAlignedParagraph(Document document, String text, PdfFont font, float fontSize) {
-        document.add(new Paragraph(text)
-                .setFont(font)
-                .setFontSize(fontSize)
-                .setTextAlignment(TextAlignment.RIGHT));
+        // Subtotal and Total cells
+        Cell subtotalCell = new Cell().add(new Paragraph("Subtotal: " + invoice.getTotalDue())
+                .setFont(fontMedium)
+                .setFontSize(10)
+                .setTextAlignment(TextAlignment.RIGHT)
+                .setMarginRight(30)); // Adjust margin as needed
+        subtotalCell.setBorder(new SolidBorder(1));
+        
+        Cell taxCell = new Cell().add(new Paragraph("Tax: " + invoice.getTotalDue())
+                .setFont(fontMedium)
+                .setFontSize(10)
+                .setTextAlignment(TextAlignment.RIGHT)
+                .setMarginRight(30)); // Adjust margin as needed
+        subtotalCell.setBorder(new SolidBorder(1));
+
+        Cell totalCell = new Cell().add(new Paragraph("Total: " + invoice.getTotalDue())
+                .setFont(fontMedium)
+                .setFontSize(10)
+                .setTextAlignment(TextAlignment.RIGHT)
+                .setMarginRight(30)); // Adjust margin as needed
+        totalCell.setBorder(new SolidBorder(1));
+
+        table.addCell(subtotalCell);
+        table.addCell(taxCell);
+        table.addCell(totalCell);
+
+        // Add the table to the document
+        document.add(table);
     }
 
     private void addPaymentDetails(Document document, Invoice invoice) {
         PaymentDetails paymentDetails = invoice.getPaymentDetails();
         if (paymentDetails != null) {
-            document.add(createDetailParagraph("Payment Method: ", paymentDetails.getPaymentMethod()));
-            document.add(createDetailParagraph("Bank Name: ", paymentDetails.getBankName()));
-            document.add(createDetailParagraph("Bank Account: ", paymentDetails.getBankAccount()));
+            // Payment Method
+            Paragraph paymentMethodParagraph = new Paragraph("Payment Method: ")
+                    .setFont(fontMedium)
+                    .setFontSize(12)
+                    .setTextAlignment(TextAlignment.LEFT);
+            paymentMethodParagraph.setFixedLeading(10);
+            document.add(paymentMethodParagraph);
+
+            // Bank Name and Bank Account in a table
+            Table table = new Table(UnitValue.createPercentArray(new float[]{50, 50}));
+            table.setWidth(UnitValue.createPercentValue(100));
+            table.setBorder(Border.NO_BORDER);
+
+            // Bank Name Cell
+            Paragraph bankNameParagraph = new Paragraph("Bank Name: " + paymentDetails.getBankName())
+                    .setFont(fontLight)
+                    .setFontSize(10)
+                    .setTextAlignment(TextAlignment.LEFT);
+            Cell bankNameCell = new Cell().add(bankNameParagraph);
+            bankNameCell.setBorder(Border.NO_BORDER);
+            table.addCell(bankNameCell);
+
+            // Bank Account Cell
+            Paragraph bankAccountParagraph = new Paragraph("Bank Account: " + paymentDetails.getBankAccount())
+                    .setFont(fontLight)
+                    .setFontSize(10)
+                    .setTextAlignment(TextAlignment.LEFT);
+            Cell bankAccountCell = new Cell().add(bankAccountParagraph);
+            bankAccountCell.setBorder(Border.NO_BORDER);
+            table.addCell(bankAccountCell);
+
+            document.add(table);
         }
     }
     
-	private Paragraph createDetailParagraph(String label, String value) {
-        return new Paragraph().add(label + value)
-                .setFont(fontLight)
-                .setFontSize(10);
-    }
 
     private void addFooterImage(Document document, String imagePath) throws IOException {
         ImageData footerImgData = ImageDataFactory.create(imagePath);
@@ -213,8 +273,51 @@ public class PdfGeneratorService {
         document.add(footerImg);
 
         document.add(new Paragraph().setFixedLeading(10));
-        document.add(new Paragraph().setFixedLeading(10));
     }
+    
+	private void addThanksAndSignature(Document document, Invoice invoice) {
+		// Create the table with two columns
+        Table table = new Table(UnitValue.createPercentArray(new float[]{70, 30}));
+        table.setWidth(UnitValue.createPercentValue(100));
+        table.setBorder(Border.NO_BORDER);
+
+        // Add the "Thank you for purchase!" cell
+        Paragraph thankYouParagraph = new Paragraph("Thank you for purchase!")
+                .setFont(fontMedium)
+                .setFontSize(18)
+                .setTextAlignment(TextAlignment.LEFT);
+        thankYouParagraph.setFixedLeading(8);
+        Cell thankYouCell = new Cell().add(thankYouParagraph);
+        thankYouCell.setBorder(Border.NO_BORDER);
+        table.addCell(thankYouCell);
+
+        // Add the signature cell
+        Paragraph signatureParagraph = new Paragraph("Krishna G")
+                .setFont(fontMedium)
+                .setFontSize(12)
+                .setTextAlignment(TextAlignment.RIGHT);
+        signatureParagraph.setFixedLeading(8);
+        Paragraph separatorParagraph = new Paragraph("___________")
+                .setFont(fontLight)
+                .setFontSize(10)
+                .setFontColor(ColorConstants.GRAY)
+                .setTextAlignment(TextAlignment.RIGHT);
+        separatorParagraph.setFixedLeading(8);
+        Paragraph roleParagraph = new Paragraph("Administrator")
+                .setFont(fontLight)
+                .setFontSize(10)
+                .setTextAlignment(TextAlignment.RIGHT);
+        roleParagraph.setFixedLeading(10);
+        
+        Cell signatureCell = new Cell().add(signatureParagraph).add(separatorParagraph).add(roleParagraph);
+        signatureCell.setBorder(Border.NO_BORDER);
+        signatureCell.setTextAlignment(TextAlignment.RIGHT);
+        table.addCell(signatureCell);
+
+        // Add the table to the document
+        document.add(table);
+
+	}
 
     private void addFooterText(Document document) {
         Paragraph footerText = new Paragraph(newsOnWhatsAppAddress)
