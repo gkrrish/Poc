@@ -1,6 +1,5 @@
 package com.poc.service;
 
-import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -14,16 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.itextpdf.io.exceptions.IOException;
-import com.itextpdf.kernel.colors.ColorConstants;
-import com.itextpdf.kernel.geom.PageSize;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Cell;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.properties.TextAlignment;
-import com.itextpdf.layout.properties.UnitValue;
 import com.poc.entity.UserDetails;
 import com.poc.master.entity.Country;
 import com.poc.master.entity.State;
@@ -57,6 +46,16 @@ public class UserService {
 	private MandalRepository mandalRepository;
 	@Autowired
 	private PdfService pdfService;
+	
+	public ResponseEntity<?> processWelcomeRequest(WelcomeRequest request) throws java.io.IOException {
+        ExistingUserDetails existingUserDetails = getSubscriptioinDetails(request.getMobileNumber());
+
+        if (existingUserDetails.getMobileNumber().isEmpty() || existingUserDetails.getMobileNumber().isBlank()) {
+            return generateWelcomeResponse();
+        } else {
+            return generateInvoiceResponse(existingUserDetails);
+        }
+    }
 
 	public List<String> getAllLanguges() {
 		List<String> allLanguageNames = languageRepository.findAllLanguageNames();
@@ -118,15 +117,7 @@ public class UserService {
         }).collect(Collectors.toList());
 	}
 
-	public ResponseEntity<?> processWelcomeRequest(WelcomeRequest request) throws java.io.IOException {
-        ExistingUserDetails existingUserDetails = getSubscriptioinDetails(request.getMobileNumber());
-
-        if (existingUserDetails.getMobileNumber().isEmpty() || existingUserDetails.getMobileNumber().isBlank()) {
-            return generateWelcomeResponse();
-        } else {
-            return generateInvoiceResponse(existingUserDetails);
-        }
-    }
+	
 
     private ResponseEntity<?> generateWelcomeResponse() {
         WelcomeResponse welcomeResponse = new WelcomeResponse(StringUtils.WELCOME_MESSAGE);
@@ -146,51 +137,4 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to generate invoice");
         }
     }
-    
-    public byte[] createPdf() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        PdfWriter writer = new PdfWriter(baos);
-        PdfDocument pdf = new PdfDocument(writer);
-        Document document = new Document(pdf, PageSize.A4);
-
-        // Adding Title
-        Paragraph title = new Paragraph("ABOUT VEHICLE INSURED DECLARED VALUE (IDV)")
-                .setTextAlignment(TextAlignment.CENTER)
-                .setBold()
-                .setFontSize(16)
-                .setBackgroundColor(ColorConstants.LIGHT_GRAY);
-        document.add(title);
-
-        // Adding Subtitle
-        Paragraph subtitle = new Paragraph("Your Vehicle IDV")
-                .setTextAlignment(TextAlignment.CENTER)
-                .setFontSize(14);
-        document.add(subtitle);
-
-        // Creating Table
-        float[] columnWidths = {1, 1, 1, 1, 1};
-        Table table = new Table(UnitValue.createPercentArray(columnWidths)).useAllAvailableWidth();
-
-        // Adding Header
-        table.addHeaderCell(new Cell().add(new Paragraph("Vehicle")).setBackgroundColor(ColorConstants.LIGHT_GRAY));
-        table.addHeaderCell(new Cell().add(new Paragraph("Non Electrical Accessory")).setBackgroundColor(ColorConstants.LIGHT_GRAY));
-        table.addHeaderCell(new Cell().add(new Paragraph("Electrical Accessory")).setBackgroundColor(ColorConstants.LIGHT_GRAY));
-        table.addHeaderCell(new Cell().add(new Paragraph("Side Car")).setBackgroundColor(ColorConstants.LIGHT_GRAY));
-        table.addHeaderCell(new Cell().add(new Paragraph("Total IDV")).setBackgroundColor(ColorConstants.LIGHT_GRAY));
-
-        // Adding Data Row
-        table.addCell(new Cell().add(new Paragraph("27769.77")));
-        table.addCell(new Cell().add(new Paragraph("0.00")));
-        table.addCell(new Cell().add(new Paragraph("0.00")));
-        table.addCell(new Cell().add(new Paragraph("0.00")));
-        table.addCell(new Cell().add(new Paragraph("27769.77")));
-
-        document.add(table);
-        document.close();
-
-        return baos.toByteArray();
-    }
-
-
 }

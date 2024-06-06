@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.poc.my.Invoice;
-import com.poc.my.NewspaperSubscription;
-import com.poc.my.PaymentDetails;
-import com.poc.my.PdfGeneratorService;
+import com.poc.invoice.Invoice;
+import com.poc.invoice.NewspaperSubscription;
+import com.poc.invoice.PaymentDetails;
+import com.poc.invoice.PdfGeneratorService;
 
 @RestController
 public class PdfController {

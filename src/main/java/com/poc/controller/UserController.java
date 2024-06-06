@@ -1,14 +1,11 @@
 package com.poc.controller;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,10 +15,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.poc.customeinvoice.InvoiceCustomPDFService;
 import com.poc.entity.UserDetails;
 import com.poc.request.WelcomeRequest;
-import com.poc.response.ExistingUserDetails;
 import com.poc.service.UserService;
 
 @RestController
@@ -66,40 +61,4 @@ public class UserController {
 			return ResponseEntity.notFound().build();
 		}
 	}
-	
-	@GetMapping("/custompdfinvoice")
-	public ResponseEntity<?> getTest() throws FileNotFoundException {
-		ExistingUserDetails existingUserDetails = userService.getSubscriptioinDetails("+919876543210");
-		InvoiceCustomPDFService general=new InvoiceCustomPDFService();
-		byte[] customePDF = general.customePDF(existingUserDetails);
-		
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_PDF);
-		headers.setContentDispositionFormData("attachment", existingUserDetails.getMobileNumber()+".pdf");
-
-		return new ResponseEntity<>(customePDF, headers, HttpStatus.OK);
-	}
-	
-	@GetMapping("/generate")
-    public ResponseEntity<byte[]> generatePdf() {
-        byte[] pdfContent = userService.createPdf();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "inline; filename=vehicle_idv.pdf");
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .headers(headers)
-                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
-                .body(pdfContent);
-    }
-    @GetMapping("/generatex")
-    public ResponseEntity<?> getTestx() {
-    	byte[] pdfContent = userService.createPdf();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("attachment", "test.pdf");
-
-        return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
-    }
-
 }

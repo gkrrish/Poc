@@ -1,4 +1,4 @@
-package com.poc.my;
+package com.poc.invoice;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.poc.my;
+package com.poc.invoice;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
