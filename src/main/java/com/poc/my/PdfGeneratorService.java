@@ -322,19 +322,27 @@ public class PdfGeneratorService {
         document.add(table);
 
 	}
+    
+    
+	private void addFooterText(Document document) {
+	    Paragraph footerText = new Paragraph(newsOnWhatsAppAddress)
+	            .setFont(fontLight)
+	            .setFontSize(8f)
+	            .setFontColor(ColorConstants.WHITE);
+	    float[] footerColumnWidth = {600f};
 
-    private void addFooterText(Document document) {
-        Paragraph footerText = new Paragraph(newsOnWhatsAppAddress)
-                .setFont(fontLight)
-                .setFontSize(8f)
-                .setFontColor(ColorConstants.WHITE);
-        float[] footerColumnWidth = {600f};
+	    Table footerTable = new Table(footerColumnWidth);
+	    footerTable.setBackgroundColor(ColorConstants.BLACK)
+	            .addCell(new Cell().add(footerText).setBorder(Border.NO_BORDER));
 
-        Table footerTable = new Table(footerColumnWidth);
-        footerTable.setBackgroundColor(ColorConstants.BLACK)
-                .addCell(new Cell().add(footerText).setBorder(Border.NO_BORDER));
-        document.add(footerTable);
-    }
+	    // Set fixed position for the footer
+	    float pageWidth = document.getPdfDocument().getDefaultPageSize().getWidth();
+	    float leftMargin = document.getLeftMargin();
+	    float bottomMargin = document.getBottomMargin();
+	    footerTable.setFixedPosition(leftMargin, bottomMargin, pageWidth - leftMargin - document.getRightMargin());
+
+	    document.add(footerTable);
+	}
 
     private Cell createHeaderCell(String text) {
         return new Cell()
