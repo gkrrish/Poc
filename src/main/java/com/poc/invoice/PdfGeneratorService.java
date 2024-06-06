@@ -3,6 +3,7 @@ package com.poc.invoice;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -36,7 +37,7 @@ public class PdfGeneratorService {
     String EMPTY_SPACE="                                         ";
     final private String newsOnWhatsAppAddress = "News On WhatsApp:"+EMPTY_SPACE+"Registered Address: #70, Dr. Prakash Rao Nagar, Annojiguda , Hyderabad-Telangana-500088. ";
 
-    public ByteArrayInputStream generatePdf(Invoice invoice) throws IOException {
+    public ByteArrayInputStream generatePdf(InvoiceResponse invoice) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PdfWriter writer = new PdfWriter(out);
         PdfDocument pdfDoc = new PdfDocument(writer);
@@ -89,7 +90,7 @@ public class PdfGeneratorService {
         document.add(img);
     }
 
-    private void addInvoiceDetails(Document document, Invoice invoice) {
+    private void addInvoiceDetails(Document document, InvoiceResponse invoice) {
         // Invoice title and recipient name
         Paragraph invoiceTitle = new Paragraph("INVOICE TO: \n")
                 .setFont(fontLight)
@@ -150,14 +151,22 @@ public class PdfGeneratorService {
         document.add(combinedTable);
     }
 
-    private String padRight(String text, int length) {
+    private String padRight(Date date, int length) {
+    	return String.format("%-" + length + "s", date);
+	}
+
+
+	private String padRight(Long invoiceNo, int length) {
+		return String.format("%-" + length + "s", invoiceNo);
+	}
+
+
+	private String padRight(String text, int length) {
         return String.format("%-" + length + "s", text);
     }
+    
 
-
-   
-
-    private void addSubscriptionTable(Document document, Invoice invoice) {
+    private void addSubscriptionTable(Document document, InvoiceResponse invoice) {
         Paragraph newspaperSubscriptionParagraph = new Paragraph("News Paper Subscriptions :")
                 .setFontSize(9)
                 .setFont(fontLight)
@@ -174,13 +183,13 @@ public class PdfGeneratorService {
 
         invoice.getSubscriptions().forEach(subscription -> {
             Stream.of(
-                    subscription.getNewspaper(),
+                    subscription.getNewsPaperName(),
                     subscription.getLanguage(),
                     subscription.getState(),
                     subscription.getDistrict(),
                     subscription.getMandal(),
-                    subscription.getScheduledTime(),
-                    String.valueOf(subscription.getMonthlySubscription())
+                    subscription.getBatchTime(),
+                    String.valueOf(subscription.getSubscriptionCharges())
             ).map(this::createDataCell)
                     .forEach(table::addCell);
         });
@@ -188,7 +197,7 @@ public class PdfGeneratorService {
         document.add(table);
     }
 
-    private void addInvoiceSummary(Document document, Invoice invoice) {
+    private void addInvoiceSummary(Document document, InvoiceResponse invoice) {
         // Table for the summary and payment details
         float[] columnWidths = {4, 2}; // Two equal columns
         Table table = new Table(UnitValue.createPercentArray(columnWidths));
@@ -231,7 +240,7 @@ public class PdfGeneratorService {
                 .setBorder(new SolidBorder(0));
     }
 
-    private void addPaymentDetails(Document document, Invoice invoice) {
+    private void addPaymentDetails(Document document, InvoiceResponse invoice) {
         PaymentDetails paymentDetails = invoice.getPaymentDetails();
         if (paymentDetails != null) {
             // Payment Method
@@ -278,7 +287,7 @@ public class PdfGeneratorService {
         document.add(new Paragraph().setFixedLeading(10));
     }
     
-	private void addThanksAndSignature(Document document, Invoice invoice) {
+	private void addThanksAndSignature(Document document, InvoiceResponse invoice) {
 		// Create the table with two columns
         Table table = new Table(UnitValue.createPercentArray(new float[]{70, 30}));
         table.setWidth(UnitValue.createPercentValue(100));

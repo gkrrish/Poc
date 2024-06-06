@@ -47,15 +47,34 @@ public class UserService {
 	@Autowired
 	private PdfService pdfService;
 	
+	
 	public ResponseEntity<?> processWelcomeRequest(WelcomeRequest request) throws java.io.IOException {
         ExistingUserDetails existingUserDetails = getSubscriptioinDetails(request.getMobileNumber());
 
-        if (existingUserDetails.getMobileNumber().isEmpty() || existingUserDetails.getMobileNumber().isBlank()) {
+        if (existingUserDetails==null ||existingUserDetails.getMobileNumber()==null|| existingUserDetails.getMobileNumber().isEmpty() || existingUserDetails.getMobileNumber().isBlank()) {
             return generateWelcomeResponse();
         } else {
             return generateInvoiceResponse(existingUserDetails);
         }
     }
+	
+	public ExistingUserDetails getSubscriptioinDetails(String mobileNumber) {
+		UserDetails userDetails = userDetailsRepository.findByMobileNumber(mobileNumber);
+		if(userDetails==null) {
+			return new ExistingUserDetails();
+		}
+		List<Object[]> queryResults = userDetailsRepository.getUserDetailsByMobileNumber(mobileNumber);
+
+        ExistingUserDetails existingUserDetails = new ExistingUserDetails();
+        existingUserDetails.setMobileNumber(userDetails.getMobileNumber());
+
+        List<UserDetailsResponse> detailsList = existingUserConversion(queryResults);
+        existingUserDetails.setDetails(detailsList);
+        double totalSubscriptionCharges = detailsList.stream().mapToDouble(details -> details.getSubscriptionCharges().doubleValue()).sum();
+        existingUserDetails.setTotalSubscriptionCharges(totalSubscriptionCharges);
+        
+        return existingUserDetails;
+	}
 
 	public List<String> getAllLanguges() {
 		List<String> allLanguageNames = languageRepository.findAllLanguageNames();
@@ -74,25 +93,7 @@ public class UserService {
                 .collect(Collectors.toList());
 	}
 
-	public ExistingUserDetails getSubscriptioinDetails(String mobileNumber) {
-		UserDetails userDetails = userDetailsRepository.findByMobileNumber(mobileNumber);
-		if(userDetails==null) {
-			return new ExistingUserDetails();
-		}
-		List<Object[]> queryResults = userDetailsRepository.getUserDetailsByMobileNumber(mobileNumber);
-
-        ExistingUserDetails existingUserDetails = new ExistingUserDetails();
-        existingUserDetails.setMobileNumber(userDetails.getMobileNumber());
-
-        List<UserDetailsResponse> detailsList = existingUserConversion(queryResults);
-
-        existingUserDetails.setDetails(detailsList);
-
-        double totalSubscriptionCharges = detailsList.stream().mapToDouble(details -> details.getSubscriptionCharges().doubleValue()).sum();
-        existingUserDetails.setTotalSubscriptionCharges(totalSubscriptionCharges);
-        
-        return existingUserDetails;
-	}
+	
 
 	
 	public List<String> getAllDistricts(String stateName) {
@@ -130,7 +131,7 @@ public class UserService {
             byte[] invoice = pdfService.generateInvoice(existingUserDetails);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDispositionFormData("attachment", "invoice.pdf");
+            headers.setContentDispositionFormData("attachment", existingUserDetails.getMobileNumber()+".pdf");
             return new ResponseEntity<>(invoice, headers, HttpStatus.OK);
         } catch (IOException e) {
             e.printStackTrace(); // Handle the exception properly, maybe return an error response

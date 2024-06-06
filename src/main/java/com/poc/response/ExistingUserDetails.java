@@ -14,4 +14,5 @@ public class ExistingUserDetails {
 	private String mobileNumber;
 	private List<UserDetailsResponse> details;
 	private double totalSubscriptionCharges;
+	
 }

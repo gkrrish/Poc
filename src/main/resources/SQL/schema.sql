@@ -158,6 +158,15 @@ CREATE TABLE USER_STATUS (
     PRIMARY KEY (UserID),
     FOREIGN KEY (UserID) REFERENCES USER_DETAILS(UserID)
 );
+
+
+CREATE TABLE INVOICE (
+    InvoiceID NUMBER(10) PRIMARY KEY,
+    UserID NUMBER(10) NOT NULL,
+    InvoiceDate DATE NOT NULL,
+    FOREIGN KEY (UserID) REFERENCES USER_DETAILS(UserID)
+);
+
 =============================================================================================================================
 
 -- Create the function generate_location_name in PL/SQL
