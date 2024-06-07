@@ -16,10 +16,16 @@ public class UserSubscriptionController {
 	@Autowired
 	UserSubscriptionService userSubscriptionService;
 
-	@GetMapping("/distinct-states")
-    public ResponseEntity<List<Object[]>> getDistinctStatesByLanguage(@RequestParam String languageName) {
+	@GetMapping("/distinct-stateswise-newspapers-by-languagename")
+    public ResponseEntity<List<Object[]>> getDistinctNewsPapersOnStatesByLanguage(@RequestParam String languageName) {
         List<Object[]> states = userSubscriptionService.getDistinctStatesByLanguage(languageName);
         return ResponseEntity.ok(states);
+    }
+	
+	@GetMapping("/distinct-newspapers-by-statename")
+    public ResponseEntity<List<Object[]>> getDistinctNewspapersByStateName(@RequestParam String stateName) {
+        List<Object[]> newspapers = userSubscriptionService.getDistinctNewspapersByStateName(stateName);
+        return ResponseEntity.ok(newspapers);
     }
 
 }
