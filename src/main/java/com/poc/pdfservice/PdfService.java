@@ -32,8 +32,6 @@ public class PdfService {
 		UserDetails userDetails = userDetailsRepository.findByMobileNumber(existingUserDetails.getMobileNumber());
 		Optional<Invoice> invoiceUserDetails = invoiceRepository.findByUserOrderByInvoiceDateDesc(userDetails).stream().findFirst();
 		
-		System.out.println(invoiceUserDetails.get().toString());
-		
 		 InvoiceResponse invoice = new InvoiceResponse();
          invoice.setInvoiceTo(userDetails.getUsername());
          invoice.setMobileNumber(userDetails.getMobileNumber());

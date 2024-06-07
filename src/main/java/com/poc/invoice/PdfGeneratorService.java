@@ -108,7 +108,7 @@ public class PdfGeneratorService {
         // Left details
         Paragraph leftDetails = new Paragraph();
         leftDetails.add(new Paragraph("Mobile number   : " + invoice.getMobileNumber()).setFont(fontLight).setFontSize(10)).setFixedLeading(12f);
-        leftDetails.add(new Paragraph());
+        leftDetails.add(new Paragraph("\n"));
         leftDetails.add(new Paragraph("Email           : " + invoice.getEmail()).setFont(fontLight).setFontSize(10)).setFixedLeading(12f);
         leftDetails.add(new Paragraph("Contact Details : " + padRight(invoice.getContactDetails(), 30)).setFont(fontLight).setFontSize(10)).setFixedLeading(12f);
 
@@ -119,7 +119,8 @@ public class PdfGeneratorService {
                 .setFontSize(8.9f)
                 .setBold()
                 .setTextAlignment(TextAlignment.RIGHT))
-                .setBorder(Border.NO_BORDER);
+                .setBorder(Border.NO_BORDER)
+                .setMarginRight(25);
         rightDetails.add(new Paragraph());
         rightDetails.add(new Paragraph(String.valueOf(invoice.getTotalDue()))
                 .setFont(fontMedium)
