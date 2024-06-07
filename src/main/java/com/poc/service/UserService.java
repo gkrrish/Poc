@@ -16,6 +16,7 @@ import com.itextpdf.io.exceptions.IOException;
 import com.poc.entity.UserDetails;
 import com.poc.master.entity.Country;
 import com.poc.master.entity.State;
+import com.poc.master.repository.BatchJobRepository;
 import com.poc.master.repository.CountryRepository;
 import com.poc.master.repository.DistrictRepository;
 import com.poc.master.repository.IndianNewspaperLanguageRepository;
@@ -46,6 +47,11 @@ public class UserService {
 	private MandalRepository mandalRepository;
 	@Autowired
 	private PdfService pdfService;
+	@Autowired
+	private BatchJobRepository batchJobRepository;
+	
+	
+	
 	
 	
 	public ResponseEntity<?> processWelcomeRequest(WelcomeRequest request) throws java.io.IOException {
@@ -138,4 +144,8 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to generate invoice");
         }
     }
+
+	public List<String> getAllDeliveryTimes() {
+		return batchJobRepository.findAllDeliveryTimes();
+	}
 }

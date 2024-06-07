@@ -51,6 +51,15 @@ public class UserController {
 	public List<String> getMandals(@PathVariable String mobileNumber, @PathVariable String districtName) {
 		return userService.getAllMandals(districtName);
 	}
+	
+	
+	@GetMapping("/scheduledtime/{mobileNumber}")
+	@ResponseStatus(value = HttpStatus.OK)
+	@ResponseBody
+	public List<String> getBatchTimes(@PathVariable String mobileNumber) {
+		return userService.getAllDeliveryTimes();
+	}
+	
 
 	@GetMapping("/{userId}")
 	public ResponseEntity<UserDetails> getUserDetails(@PathVariable Long userId) {
