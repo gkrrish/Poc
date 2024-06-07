@@ -27,5 +27,11 @@ public class UserSubscriptionController {
         List<Object[]> newspapers = userSubscriptionService.getDistinctNewspapersByStateName(stateName);
         return ResponseEntity.ok(newspapers);
     }
+	
+	@GetMapping("/distinct-state-by-newspaper")
+    public ResponseEntity<List<Object[]>> getDistinctStatesByNewspaperName(@RequestParam String newspaperName) {
+        List<Object[]> states = userSubscriptionService.getDistinctStatesByNewspaperName(newspaperName);
+        return ResponseEntity.ok(states);
+    }
 
 }
