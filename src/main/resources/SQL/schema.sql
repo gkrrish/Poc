@@ -100,20 +100,22 @@ CREATE TABLE MASTER_NEWSPAPER (
 );
 
 CREATE TABLE VENDORS (
-    newspaper_id INT PRIMARY KEY,
+    newspaper_id INT,
     location_id INT,
     newspaper_master_id INT,
     newspaper_language INT,
     subscription_type_id INT,
     category_id INT,
     publication_type VARCHAR2(10) CHECK (publication_type IN ('Newspaper', 'Magazine')),
-    
+
     FOREIGN KEY (location_id) REFERENCES MASTER_STATEWISE_LOCATIONS(location_id),
     FOREIGN KEY (newspaper_master_id) REFERENCES MASTER_NEWSPAPER(newspaper_master_id),
     FOREIGN KEY (newspaper_language) REFERENCES MASTER_NEWS_LANGUAGES(language_id),
     FOREIGN KEY (subscription_type_id) REFERENCES SUBSCRIPTION_TYPE(subscriptiontypeid),
-    FOREIGN KEY (category_id) REFERENCES MASTER_CATEGORY_TYPE(category_id)
+    FOREIGN KEY (category_id) REFERENCES MASTER_CATEGORY_TYPE(category_id),
+    PRIMARY KEY (newspaper_id, location_id, newspaper_master_id)
 );
+
 
 ==================================VENDOR RELATED DETAILS COMPLETED==========================================================
 CREATE TABLE NEWSPAPER_FILES (
@@ -194,3 +196,23 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Location Name: ' || loc_name);
 END;
 ===================================================================================================================================
+
+ALTER TABLE USER_SUBSCRIPTION
+ADD location_id INT,
+ADD newspaper_master_id INT;
+
+-- Step 2: Add the composite foreign key constraint
+ALTER TABLE USER_SUBSCRIPTION
+ADD CONSTRAINT fk_user_subscription_vendors FOREIGN KEY (newspaper_id, location_id, newspaper_master_id)
+REFERENCES VENDORS(newspaper_id, location_id, newspaper_master_id);
+
+
+
+
+ALTER TABLE NEWSPAPER_FILES
+ADD location_id INT
+ADD newspaper_master_id INT;
+
+ALTER TABLE NEWSPAPER_FILES
+ADD CONSTRAINT fk_newspaper_files_vendors FOREIGN KEY (newspaper_id, location_id, newspaper_master_id)
+REFERENCES VENDORS(newspaper_id, location_id, newspaper_master_id);

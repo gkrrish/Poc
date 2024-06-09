@@ -72,3 +72,45 @@ public class UserController {
 	}
 	
 }
+/*
+SELECT constraint_name, table_name 
+FROM user_constraints 
+WHERE r_constraint_name = 'SYS_C007023';
+
+ALTER TABLE NEWSPAPER_FILES
+DROP CONSTRAINT SYS_C007030;
+
+ALTER TABLE VENDORS
+DROP CONSTRAINT SYS_C007023;
+
+ALTER TABLE VENDORS
+ADD CONSTRAINT vendors_pk PRIMARY KEY (newspaper_id, location_id, newspaper_master_id);
+
+ALTER TABLE USER_SUBSCRIPTION
+ADD CONSTRAINT SYS_C007033 FOREIGN KEY (newspaper_id, location_id, newspaper_master_id) REFERENCES VENDORS(newspaper_id, location_id, newspaper_master_id);
+
+
+ALTER TABLE USER_SUBSCRIPTION
+ADD location_id INT
+ADD newspaper_master_id INT;
+
+ALTER TABLE USER_SUBSCRIPTION
+ADD CONSTRAINT fk_user_subscription_vendors FOREIGN KEY (newspaper_id, location_id, newspaper_master_id)
+REFERENCES VENDORS(newspaper_id, location_id, newspaper_master_id);
+
+
+ALTER TABLE NEWSPAPER_FILES
+ADD CONSTRAINT SYS_C007030 FOREIGN KEY (newspaper_id, location_id, newspaper_master_id) REFERENCES VENDORS(newspaper_id, location_id, newspaper_master_id);
+
+
+
+ALTER TABLE NEWSPAPER_FILES
+ADD location_id INT
+ADD newspaper_master_id INT;
+
+
+
+
+ALTER TABLE NEWSPAPER_FILES
+ADD CONSTRAINT fk_newspaper_files_vendors FOREIGN KEY (newspaper_id, location_id, newspaper_master_id)
+REFERENCES VENDORS(newspaper_id, location_id, newspaper_master_id);*/

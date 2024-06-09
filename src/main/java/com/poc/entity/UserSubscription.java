@@ -6,28 +6,34 @@ import com.poc.master.entity.Vendor;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "USER_SUBSCRIPTION")
 @Data
+@NoArgsConstructor
 public class UserSubscription {
 
-	@EmbeddedId
-	private UserSubscriptionId id;
+    @EmbeddedId
+    private UserSubscriptionId id;
 
-	@ManyToOne
-	@JoinColumn(name = "user_id", insertable = false, updatable = false)
-	private UserDetails userDetails;
+    @ManyToOne
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private UserDetails userDetails;
 
-	@ManyToOne
-	@JoinColumn(name = "newspaper_id", insertable = false, updatable = false)
-	private Vendor vendor;
+    @ManyToOne
+    @JoinColumns({
+        @JoinColumn(name = "newspaper_id", referencedColumnName = "newspaper_id", insertable = false, updatable = false),
+        @JoinColumn(name = "location_id", referencedColumnName = "location_id", insertable = false, updatable = false),
+        @JoinColumn(name = "newspaper_master_id", referencedColumnName = "newspaper_master_id", insertable = false, updatable = false)
+    })
+    private Vendor vendor;
 
-	@ManyToOne
-	@JoinColumn(name = "batch_id")
-	private BatchJob batch;
-
+    @ManyToOne
+    @JoinColumn(name = "batch_id")
+    private BatchJob batch;
 }
