@@ -29,7 +29,8 @@ public class PdfService {
 
 	public byte[] generateInvoice(ExistingUserDetails existingUserDetails) throws IOException {
 		
-		UserDetails userDetails = userDetailsRepository.findByMobileNumber(existingUserDetails.getMobileNumber());
+		Optional<UserDetails> userDetailsOptional = userDetailsRepository.findByMobileNumber(existingUserDetails.getMobileNumber());
+		UserDetails userDetails = userDetailsOptional.get();
 		Optional<Invoice> invoiceUserDetails = invoiceRepository.findByUserOrderByInvoiceDateDesc(userDetails).stream().findFirst();
 		
 		 InvoiceResponse invoice = new InvoiceResponse();

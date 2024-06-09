@@ -2,7 +2,6 @@ package com.poc.master.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,7 +23,7 @@ public class Mandal {
 	@Column(name = "mandal_name")
 	private String mandalName;
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "district_id")
+	@ManyToOne
+	@JoinColumn(name = "district_id", referencedColumnName = "district_id")
 	private District district;
 }

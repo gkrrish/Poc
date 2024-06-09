@@ -1,62 +1,55 @@
 package com.poc.master.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.Data;
-
 import jakarta.persistence.*;
-import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "SUBSCRIPTION_TYPE")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SubscriptionType {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "subscriptiontypeid")
-	private Integer subscriptionTypeId;
+    public enum SubscriptionDurationEnum {
+        ONE_MONTH("1 MONTH"),
+        THREE_MONTHS("3 MONTHS"),
+        SIX_MONTHS("6 MONTHS"),
+        TWELVE_MONTHS("12 MONTHS");
 
-	@Column(name = "subscriptiontype", nullable = false, length = 10)
-	@Enumerated(EnumType.STRING)
-	private SubscriptionTypeEnum subscriptionType;
+        private String duration;
 
-	@Column(name = "subscriptionduration", nullable = false, length = 10)
-	@Enumerated(EnumType.STRING)
-	private SubscriptionDurationEnum subscriptionDuration;
+        SubscriptionDurationEnum(String duration) {
+            this.duration = duration;
+        }
 
-	@Column(name = "subscriptionfee", nullable = false, precision = 10, scale = 2)
-	private BigDecimal subscriptionFee;
+        public String getDuration() {
+            return duration;
+        }
+     // Add a method to get enum constant by duration string
+        public static SubscriptionDurationEnum fromDuration(String duration) {
+            for (SubscriptionDurationEnum value : values()) {
+                if (value.duration.equals(duration)) {
+                    return value;
+                }
+            }
+            throw new IllegalArgumentException("Invalid Subscription Duration: " + duration);
+        }
+    }
 
-	public enum SubscriptionTypeEnum {
-		FREE, PAID
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "subscriptiontypeid")  
+    private Long subscriptionTypeId;
 
-	public enum SubscriptionDurationEnum {
-		ONE_MONTH("1 MONTH"), THREE_MONTHS("3 MONTHS"), SIX_MONTHS("6 MONTHS"), TWELVE_MONTHS("12 MONTHS");
+    @Enumerated(EnumType.STRING)
+    @Column(name = "subscriptionduration")  
+    private SubscriptionDurationEnum subscriptionDuration;
 
-		private final String value;
+    @Column(name = "subscriptionfee")  
+    private double subscriptionFee;
 
-		SubscriptionDurationEnum(String value) {
-			this.value = value;
-		}
-
-		@Override
-		public String toString() {
-			return this.value;
-		}
-
-		public static SubscriptionDurationEnum fromValue(String value) {
-			for (SubscriptionDurationEnum duration : values()) {
-				if (duration.value.equals(value)) {
-					return duration;
-				}
-			}
-			throw new IllegalArgumentException("Unknown subscription duration: " + value);
-		}
-	}
+    @Column(name = "subscriptiontype")  
+    private String subscriptionType;
 }

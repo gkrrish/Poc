@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class VendorId implements Serializable {
   
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Column(name = "newspaper_id")
+    @Column(name = "newspaper_id")
     private Long newspaperId;
 
     @Column(name = "location_id")

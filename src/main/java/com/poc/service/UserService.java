@@ -65,14 +65,14 @@ public class UserService {
     }
 	
 	public ExistingUserDetails getSubscriptioinDetails(String mobileNumber) {
-		UserDetails userDetails = userDetailsRepository.findByMobileNumber(mobileNumber);
+		Optional<UserDetails> userDetails = userDetailsRepository.findByMobileNumber(mobileNumber);
 		if(userDetails==null) {
 			return new ExistingUserDetails();
 		}
 		List<Object[]> queryResults = userDetailsRepository.getUserDetailsByMobileNumber(mobileNumber);
 
         ExistingUserDetails existingUserDetails = new ExistingUserDetails();
-        existingUserDetails.setMobileNumber(userDetails.getMobileNumber());
+        existingUserDetails.setMobileNumber(userDetails.get().getMobileNumber());
 
         List<UserDetailsResponse> detailsList = existingUserConversion(queryResults);
         existingUserDetails.setDetails(detailsList);

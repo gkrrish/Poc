@@ -22,7 +22,7 @@ public class UserDetailsRepositoryTest {
 	public void testFindByMobileNumber() {
 		String mobileNumber = "+919876543210";
 
-		UserDetails userDetails = userDetailsRepository.findByMobileNumber(mobileNumber);
+		UserDetails userDetails = userDetailsRepository.findByMobileNumber(mobileNumber).get();
 
 		assertNotNull(userDetails);
 		assertEquals(mobileNumber, userDetails.getMobileNumber());

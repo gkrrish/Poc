@@ -1,6 +1,7 @@
 package com.poc.master.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +21,7 @@ public interface MasterNewspaperRepository extends JpaRepository<MasterNewspaper
 	           "JOIN State ms ON msl.state = ms " +
 	           "WHERE ms.stateName = :stateName")
 	    List<Object[]> findDistinctNewspapersByStateName(@Param("stateName") String stateName);
+	    
+	    
+	    Optional<MasterNewspaper> findByNewspaperName(String newspaperName);
 }

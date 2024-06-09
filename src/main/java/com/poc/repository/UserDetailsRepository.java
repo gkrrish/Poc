@@ -1,6 +1,7 @@
 package com.poc.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,7 +14,7 @@ import com.poc.entity.UserDetails;
 @Repository
 public interface UserDetailsRepository extends JpaRepository<UserDetails, Long> {
 	
-	UserDetails findByMobileNumber(String mobileNumber);
+	Optional<UserDetails> findByMobileNumber(String mobileNumber);
 	
 	@Query(value = "SELECT ud.UserID, " +
             "ud.mobileNumber, " +
@@ -39,5 +40,6 @@ public interface UserDetailsRepository extends JpaRepository<UserDetails, Long> 
             "WHERE ud.mobileNumber = :mobileNumber",
             nativeQuery = true)
     List<Object[]> getUserDetailsByMobileNumber(@Param("mobileNumber") String mobileNumber);
+    
 
 }
