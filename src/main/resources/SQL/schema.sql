@@ -121,9 +121,12 @@ CREATE TABLE VENDORS (
 CREATE TABLE NEWSPAPER_FILES (
     file_id INT PRIMARY KEY,
     newspaper_id INT,
+    location_id INT,
+    newspaper_master_id INT,
     file_location VARCHAR2(512),
     upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (newspaper_id) REFERENCES VENDORS(newspaper_id)
+    CONSTRAINT fk_newspaper_files_vendors FOREIGN KEY (newspaper_id, location_id, newspaper_master_id)
+    REFERENCES VENDORS(newspaper_id, location_id, newspaper_master_id)
 );
 
 =================================NEWS PAPER FILE LOCATION COMPLETED===========================================================
@@ -139,17 +142,24 @@ CREATE TABLE USER_NEWSPAPER_SUBSCRIPTION (
     FOREIGN KEY (subscriptiontypeid) REFERENCES SUBSCRIPTION_TYPE(subscriptiontypeid)
 );
 
-
 CREATE TABLE USER_SUBSCRIPTION (
     user_id INT,
     newspaper_id INT,
     batch_id NUMBER,
-    
+    location_id INT,
+    newspaper_master_id INT,
+
+    -- Primary Key Constraint
     CONSTRAINT PK_UX_USER_SUBSCRIPTION PRIMARY KEY (user_id, newspaper_id),
+
+    -- Foreign Key Constraints
     FOREIGN KEY (user_id) REFERENCES USER_DETAILS(UserID),
     FOREIGN KEY (newspaper_id) REFERENCES VENDORS(newspaper_id),
-    FOREIGN KEY (batch_id) REFERENCES MASTER_BATCH_JOBS(BATCH_ID)
+    FOREIGN KEY (batch_id) REFERENCES MASTER_BATCH_JOBS(BATCH_ID),
+    FOREIGN KEY (newspaper_id, location_id, newspaper_master_id) REFERENCES VENDORS(newspaper_id, location_id, newspaper_master_id)
 );
+===================================================================================================================================
+
 
 CREATE TABLE USER_STATUS (
     UserID NUMBER(10),
@@ -195,24 +205,4 @@ BEGIN
     loc_name := generate_location_name(9, 24, 3, 1); 
     DBMS_OUTPUT.PUT_LINE('Location Name: ' || loc_name);
 END;
-===================================================================================================================================
-
-ALTER TABLE USER_SUBSCRIPTION
-ADD location_id INT,
-ADD newspaper_master_id INT;
-
--- Step 2: Add the composite foreign key constraint
-ALTER TABLE USER_SUBSCRIPTION
-ADD CONSTRAINT fk_user_subscription_vendors FOREIGN KEY (newspaper_id, location_id, newspaper_master_id)
-REFERENCES VENDORS(newspaper_id, location_id, newspaper_master_id);
-
-
-
-
-ALTER TABLE NEWSPAPER_FILES
-ADD location_id INT
-ADD newspaper_master_id INT;
-
-ALTER TABLE NEWSPAPER_FILES
-ADD CONSTRAINT fk_newspaper_files_vendors FOREIGN KEY (newspaper_id, location_id, newspaper_master_id)
-REFERENCES VENDORS(newspaper_id, location_id, newspaper_master_id);
+==================================================================================================================================
