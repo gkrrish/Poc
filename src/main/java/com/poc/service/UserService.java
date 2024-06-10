@@ -1,6 +1,8 @@
 package com.poc.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -132,11 +134,12 @@ public class UserService {
     }
 
     private ResponseEntity<?> generateInvoiceResponse(ExistingUserDetails existingUserDetails) throws java.io.IOException {
+    	String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MMMYYYY"));
         try {
             byte[] invoice = pdfService.generateInvoice(existingUserDetails);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDispositionFormData("attachment", existingUserDetails.getMobileNumber()+".pdf");
+            headers.setContentDispositionFormData("attachment", todayDate+"_invoice"+".pdf");
             return new ResponseEntity<>(invoice, headers, HttpStatus.OK);
         } catch (IOException e) {
             e.printStackTrace(); // Handle the exception properly, maybe return an error response
