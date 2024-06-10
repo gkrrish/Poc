@@ -16,4 +16,9 @@ public interface BatchJobRepository extends JpaRepository<BatchJob, Long> {
 	List<String> findAllDeliveryTimes();
 
 	Optional<BatchJob> findByDeliveryTime(String deliveryTime);
+	
+	 @Query("SELECT bj.deliveryTime FROM BatchJob bj WHERE bj.batchId BETWEEN :startId AND :endId")
+	 List<String> findDeliveryTimesInRange(Long startId, Long endId);
+	
+	
 }

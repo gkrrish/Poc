@@ -76,14 +76,15 @@ public class UserSubscriptionService {
         Long newspaperMasterId = newspaper.getId();
 
         BatchJob batchJob = batchJobRepository.findByDeliveryTime(batchTime).orElseThrow(() -> new RuntimeException("Batch not found"));
-        Long batchId = batchJob.getBatchId();
+        @SuppressWarnings("unused")
+		Long batchId = batchJob.getBatchId();
 
         Vendor vendor = vendorRepository.findVendorsByMasterIdAndLocationId(newspaperMasterId, locationId).orElseThrow(() -> new RuntimeException("Vendor not found"));
         Long newspaperId = vendor.getId().getNewspaperId();
 
         saveOrUpdateUserSubscription(userid, newspaperId, user, vendor, batchJob);
     }
-	
+	//if these inputs are kept in cache then directly call this method, while user selecting the options try to keep in cache to reduce the calls to database.
 	public void saveOrUpdateUserSubscription(Long userId, Long newspaperId, UserDetails user, Vendor vendor, BatchJob batchJob) {
 	    Optional<UserSubscription> existingSubscription = userSubscriptionRepository.findByUserIdAndNewspaperId(userId, newspaperId);
 

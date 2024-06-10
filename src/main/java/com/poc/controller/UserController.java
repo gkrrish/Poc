@@ -64,11 +64,15 @@ public class UserController {
 	@GetMapping("/{userId}")
 	public ResponseEntity<UserDetails> getUserDetails(@PathVariable Long userId) {
 		Optional<UserDetails> userDetailsOptional = userService.getUserDetails(userId);
-		if (userDetailsOptional.isPresent()) {
-			return ResponseEntity.ok(userDetailsOptional.get());
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		return userDetailsOptional.isPresent() ? ResponseEntity.ok(userDetailsOptional.get()) : ResponseEntity.notFound().build();
+
 	}
+	
+	@GetMapping("/batchids/{timePeriod}")
+    @ResponseStatus(value = HttpStatus.OK)
+    @ResponseBody
+    public List<String> getBatchIds(@PathVariable String timePeriod) {
+        return userService.getDeliveryTimesByTimePeriod(timePeriod);
+    }
 	
 }

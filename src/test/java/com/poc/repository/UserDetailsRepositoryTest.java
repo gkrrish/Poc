@@ -3,7 +3,6 @@ package com.poc.repository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -44,7 +43,7 @@ public class UserDetailsRepositoryTest {
             assertNotNull(userDetails[5]); // mandal
             assertNotNull(userDetails[6]); // batchTime
             assertNotNull(userDetails[7]); // subscriptionCharges
-            System.out.println(Arrays.toString(userDetails)); // Use Arrays.toString() to print array elements
+//            System.out.println(Arrays.toString(userDetails)); // Use Arrays.toString() to print array elements
         }
     }
 

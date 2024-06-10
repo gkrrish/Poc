@@ -28,6 +28,7 @@ import com.poc.request.WelcomeRequest;
 import com.poc.response.ExistingUserDetails;
 import com.poc.response.UserDetailsResponse;
 import com.poc.response.WelcomeResponse;
+import com.poc.util.BatchTimePeriod;
 import com.poc.util.StringUtils;
 
 @Service
@@ -49,8 +50,6 @@ public class UserService {
 	private PdfService pdfService;
 	@Autowired
 	private BatchJobRepository batchJobRepository;
-	
-	
 	
 	
 	
@@ -148,4 +147,9 @@ public class UserService {
 	public List<String> getAllDeliveryTimes() {
 		return batchJobRepository.findAllDeliveryTimes();
 	}
+	
+	public List<String> getDeliveryTimesByTimePeriod(String timePeriod) {
+        BatchTimePeriod period = BatchTimePeriod.fromString(timePeriod);
+        return batchJobRepository.findDeliveryTimesInRange(period.getStartId(), period.getEndId());
+    }
 }
