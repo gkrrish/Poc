@@ -36,4 +36,20 @@ public class UserSubscription {
     @ManyToOne
     @JoinColumn(name = "batch_id")
     private BatchJob batch;
+    
+    public void setUserDetails(UserDetails userDetails) {
+        this.userDetails = userDetails;
+        if (this.id == null) {
+            this.id = new UserSubscriptionId();
+        }
+        this.id.setUser(userDetails);
+    }
+
+    public void setVendor(Vendor vendor) {
+        this.vendor = vendor;
+        if (this.id == null) {
+            this.id = new UserSubscriptionId();
+        }
+        this.id.setVendor(vendor);
+    }
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.poc.entity.UserDetails;
 import com.poc.entity.UserSubscription;
+import com.poc.entity.UserSubscriptionId;
 import com.poc.master.entity.BatchJob;
 import com.poc.master.entity.Mandal;
 import com.poc.master.entity.MasterNewspaper;
@@ -77,21 +78,36 @@ public class UserSubscriptionService {
         BatchJob batchJob = batchJobRepository.findByDeliveryTime(batchTime).orElseThrow(() -> new RuntimeException("Batch not found"));
         Long batchId = batchJob.getBatchId();
 
-        Vendor vendor = vendorRepository.findByNewspaperMasterIdAndLocationId(newspaperMasterId, locationId).orElseThrow(() -> new RuntimeException("Vendor not found"));
+        Vendor vendor = vendorRepository.findVendorsByMasterIdAndLocationId(newspaperMasterId, locationId).orElseThrow(() -> new RuntimeException("Vendor not found"));
         Long newspaperId = vendor.getId().getNewspaperId();
 
-        Optional<UserSubscription> existingSubscription = userSubscriptionRepository.findById_User_UseridAndId_Vendor_Id_NewspaperId(userid, newspaperId);
-
-        if (existingSubscription.isPresent()) {
-            UserSubscription subscription = existingSubscription.get();
-            subscription.setBatch(batchJob);
-            userSubscriptionRepository.save(subscription);
-        } else {
-            UserSubscription newSubscription = new UserSubscription();
-            newSubscription.setUserDetails(user);
-            newSubscription.setVendor(vendor);
-            newSubscription.setBatch(batchJob);
-            userSubscriptionRepository.save(newSubscription);
-        }
+        saveOrUpdateUserSubscription(userid, newspaperId, user, vendor, batchJob);
     }
+	
+	public void saveOrUpdateUserSubscription(Long userId, Long newspaperId, UserDetails user, Vendor vendor, BatchJob batchJob) {
+	    Optional<UserSubscription> existingSubscription = userSubscriptionRepository.findByUserIdAndNewspaperId(userId, newspaperId);
+
+	    if (existingSubscription.isPresent()) {
+	        UserSubscription subscription = existingSubscription.get();
+	        subscription.setBatch(batchJob);
+	        userSubscriptionRepository.save(subscription);
+	    } else {
+	        UserSubscription newSubscription = new UserSubscription();
+	        newSubscription.setUserDetails(user);
+	        newSubscription.setVendor(vendor);
+	        newSubscription.setBatch(batchJob);
+
+	        UserSubscriptionId userSubscriptionId = new UserSubscriptionId();
+	        userSubscriptionId.setUser(user);
+	        userSubscriptionId.setVendor(vendor);
+	        newSubscription.setId(userSubscriptionId);
+
+	        userSubscriptionRepository.save(newSubscription);
+	    }
+	}
+
+	
+	  public Optional<Vendor> getVendorsByNewspaperMasterIdAndLocationId(Long newspaperMasterId, Long locationId) {
+	        return vendorRepository.findVendorsByMasterIdAndLocationId(newspaperMasterId, locationId);
+	    }
 }

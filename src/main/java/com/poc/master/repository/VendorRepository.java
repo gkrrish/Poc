@@ -21,9 +21,8 @@ public interface VendorRepository extends JpaRepository<Vendor, VendorId> {
 	           "WHERE mnl.languageName = :languageName")
 	   public List<Object[]> findDistinctStatesByLanguage(@Param("languageName") String languageName);
 	    
-	   @Query("SELECT v FROM Vendor v JOIN v.location l WHERE v.id.newspaperMasterId = :newspaperMasterId AND l.locationId = :locationId")
-	    public Optional<Vendor> findByNewspaperMasterIdAndLocationId(@Param("newspaperMasterId") Long newspaperMasterId, @Param("locationId") Long locationId);	  
-	   
-	   public Optional<Vendor> findById(VendorId id);
+	   @Query("SELECT v FROM Vendor v WHERE v.id.newspaperMasterId = :newspaperMasterId AND v.id.locationId = :locationId")
+	   Optional<Vendor> findVendorsByMasterIdAndLocationId(@Param("newspaperMasterId") Long newspaperMasterId, @Param("locationId") Long locationId);
+
 	    
 }

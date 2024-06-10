@@ -1,6 +1,17 @@
 package com.poc.master.entity;
 
-import jakarta.persistence.*;
+import com.poc.master.entity.SubscriptionType.SubscriptionDurationEnum;
+import com.poc.util.SubscriptionDurationEnumConverter;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -42,9 +53,9 @@ public class SubscriptionType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "subscriptiontypeid")  
     private Long subscriptionTypeId;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "subscriptionduration")  
+    
+    @Convert(converter = SubscriptionDurationEnumConverter.class)
+    @Column(name = "subscriptionduration")
     private SubscriptionDurationEnum subscriptionDuration;
 
     @Column(name = "subscriptionfee")  
