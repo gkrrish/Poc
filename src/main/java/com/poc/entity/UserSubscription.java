@@ -1,8 +1,11 @@
 package com.poc.entity;
 
+import java.sql.Date;
+
 import com.poc.master.entity.BatchJob;
 import com.poc.master.entity.Vendor;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -32,6 +35,12 @@ public class UserSubscription {
         @JoinColumn(name = "newspaper_master_id", referencedColumnName = "newspaper_master_id", insertable = false, updatable = false)
     })
     private Vendor vendor;
+    
+    @Column(name = "subscription_start_date")
+    private Date subscriptionStartDate;
+
+    @Column(name = "subscription_end_date")
+    private Date subscriptionEndDate;
 
     @ManyToOne
     @JoinColumn(name = "batch_id")

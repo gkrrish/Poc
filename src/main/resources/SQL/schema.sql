@@ -148,6 +148,8 @@ CREATE TABLE USER_SUBSCRIPTION (
     batch_id NUMBER,
     location_id INT,
     newspaper_master_id INT,
+    subscription_start_date DATE, -- New column
+    subscription_end_date DATE,   -- New column
 
     -- Primary Key Constraint
     CONSTRAINT PK_UX_USER_SUBSCRIPTION PRIMARY KEY (user_id, newspaper_id),
@@ -158,6 +160,7 @@ CREATE TABLE USER_SUBSCRIPTION (
     FOREIGN KEY (batch_id) REFERENCES MASTER_BATCH_JOBS(BATCH_ID),
     FOREIGN KEY (newspaper_id, location_id, newspaper_master_id) REFERENCES VENDORS(newspaper_id, location_id, newspaper_master_id)
 );
+
 ===================================================================================================================================
 
 
