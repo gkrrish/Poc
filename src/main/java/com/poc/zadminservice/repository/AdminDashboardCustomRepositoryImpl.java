@@ -28,7 +28,7 @@ public class AdminDashboardCustomRepositoryImpl implements AdminDashboardCustomR
     @Override
     public Long findTodayPositiveDeltaReaders(String newspaperName) {
         Query query = entityManager.createNativeQuery("SELECT COUNT(*) FROM USER_SUBSCRIPTION " +
-                "WHERE subscription_start_date = CURRENT_DATE " +
+                "WHERE TRUNC(subscription_start_date) = TRUNC(CURRENT_DATE) " +
                 "AND newspaper_master_id = (SELECT newspaper_master_id FROM MASTER_NEWSPAPER WHERE newspaper_name = :newspaperName)");
         query.setParameter("newspaperName", newspaperName);
         Object result = query.getSingleResult();
@@ -38,7 +38,7 @@ public class AdminDashboardCustomRepositoryImpl implements AdminDashboardCustomR
     @Override
     public Long findTodayNegativeDeltaReaders(String newspaperName) {
         Query query = entityManager.createNativeQuery("SELECT COUNT(*) FROM USER_SUBSCRIPTION " +
-                "WHERE subscription_end_date = CURRENT_DATE " +
+                "WHERE TRUNC(subscription_end_date) = TRUNC(CURRENT_DATE) " +
                 "AND newspaper_master_id = (SELECT newspaper_master_id FROM MASTER_NEWSPAPER WHERE newspaper_name = :newspaperName)");
         query.setParameter("newspaperName", newspaperName);
         Object result = query.getSingleResult();
@@ -48,23 +48,27 @@ public class AdminDashboardCustomRepositoryImpl implements AdminDashboardCustomR
     @Override
     public List<Object[]> findStatewiseDeltaReaders(String newspaperName) {
         Query query = entityManager.createNativeQuery("SELECT MS.state_name AS state, " +
-                "SUM(CASE WHEN US.subscription_start_date = CURRENT_DATE THEN 1 ELSE 0 END) AS totalPositiveDeltaInState, " +
-                "SUM(CASE WHEN US.subscription_end_date = CURRENT_DATE THEN 1 ELSE 0 END) AS totalNegativeDeltaInState " +
+                "SUM(CASE WHEN TRUNC(US.subscription_start_date) = TRUNC(CURRENT_DATE) THEN 1 ELSE 0 END) AS totalPositiveDeltaInState, " +
+                "SUM(CASE WHEN TRUNC(US.subscription_end_date) = TRUNC(CURRENT_DATE) THEN 1 ELSE 0 END) AS totalNegativeDeltaInState " +
                 "FROM USER_SUBSCRIPTION US " +
                 "JOIN USER_DETAILS UD ON US.user_id = UD.UserID " +
                 "JOIN MASTER_STATEWISE_LOCATIONS MSL ON UD.Location = MSL.location_id " +
                 "JOIN MASTER_STATES MS ON MSL.state_id = MS.state_id " +
-                "WHERE US.newspaper_master_id = (SELECT newspaper_master_id FROM MASTER_NEWSPAPER WHERE newspaper_name = :newspaperName) " +
+                "JOIN MASTER_NEWSPAPER MN ON US.newspaper_master_id = MN.newspaper_master_id " +
+                "WHERE MN.newspaper_name = :newspaperName " +
                 "GROUP BY MS.state_name");
         query.setParameter("newspaperName", newspaperName);
         return query.getResultList();
     }
+    
+    
+
 
     @Override
     public List<Object[]> findDistrictwiseDeltaReaders(String newspaperName) {
         Query query = entityManager.createNativeQuery("SELECT MD.district_name AS district, " +
-                "SUM(CASE WHEN US.subscription_start_date = CURRENT_DATE THEN 1 ELSE 0 END) AS totalPositiveDeltaInDistrict, " +
-                "SUM(CASE WHEN US.subscription_end_date = CURRENT_DATE THEN 1 ELSE 0 END) AS totalNegativeDeltaInDistrict " +
+                "SUM(CASE WHEN TRUNC(US.subscription_start_date) = TRUNC(CURRENT_DATE) THEN 1 ELSE 0 END) AS totalPositiveDeltaInDistrict, " +
+                "SUM(CASE WHEN TRUNC(US.subscription_end_date) = TRUNC(CURRENT_DATE) THEN 1 ELSE 0 END) AS totalNegativeDeltaInDistrict " +
                 "FROM USER_SUBSCRIPTION US " +
                 "JOIN USER_DETAILS UD ON US.user_id = UD.UserID " +
                 "JOIN MASTER_STATEWISE_LOCATIONS MSL ON UD.Location = MSL.location_id " +
@@ -78,8 +82,8 @@ public class AdminDashboardCustomRepositoryImpl implements AdminDashboardCustomR
     @Override
     public List<Object[]> findMandalwiseDeltaReaders(String newspaperName) {
         Query query = entityManager.createNativeQuery("SELECT MM.mandal_name AS mandal, " +
-                "SUM(CASE WHEN US.subscription_start_date = CURRENT_DATE THEN 1 ELSE 0 END) AS totalPositiveDeltaInMandal, " +
-                "SUM(CASE WHEN US.subscription_end_date = CURRENT_DATE THEN 1 ELSE 0 END) AS totalNegativeDeltaInMandal " +
+                "SUM(CASE WHEN TRUNC(US.subscription_start_date) = TRUNC(CURRENT_DATE) THEN 1 ELSE 0 END) AS totalPositiveDeltaInMandal, " +
+                "SUM(CASE WHEN TRUNC(US.subscription_end_date) = TRUNC(CURRENT_DATE) THEN 1 ELSE 0 END) AS totalNegativeDeltaInMandal " +
                 "FROM USER_SUBSCRIPTION US " +
                 "JOIN USER_DETAILS UD ON US.user_id = UD.UserID " +
                 "JOIN MASTER_STATEWISE_LOCATIONS MSL ON UD.Location = MSL.location_id " +
