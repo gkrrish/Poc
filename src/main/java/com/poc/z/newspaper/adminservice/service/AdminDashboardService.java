@@ -1,4 +1,4 @@
-package com.poc.zadminservice.service;
+package com.poc.z.newspaper.adminservice.service;
 
 import java.util.Date;
 import java.util.List;
@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.poc.master.repository.MasterNewspaperRepository;
-import com.poc.zadminservice.repository.AdminDashboardCustomRepository;
-import com.poc.zadminservice.repository.AdminDashboardRepository;
-import com.poc.zadminservice.response.AdminDashboardDailyReportResponse;
+import com.poc.z.newspaper.adminservice.repository.AdminDashboardCustomRepository;
+import com.poc.z.newspaper.adminservice.repository.AdminDashboardRepository;
+import com.poc.z.newspaper.adminservice.response.AdminDashboardDailyReportResponse;
 
 @Service
 public class AdminDashboardService {

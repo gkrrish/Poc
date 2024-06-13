@@ -1,4 +1,4 @@
-package com.poc.zadminservice.response;
+package com.poc.z.newspaper.adminservice.response;
 
 import java.util.Date;
 

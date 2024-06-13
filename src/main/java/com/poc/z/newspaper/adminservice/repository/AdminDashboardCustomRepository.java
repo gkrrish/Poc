@@ -1,4 +1,4 @@
-package com.poc.zadminservice.repository;
+package com.poc.z.newspaper.adminservice.repository;
 
 import java.util.List;
 
