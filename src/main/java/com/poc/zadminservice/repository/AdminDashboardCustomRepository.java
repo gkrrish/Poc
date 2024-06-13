@@ -10,5 +10,5 @@ public interface AdminDashboardCustomRepository {
     List<Object[]> findStatewiseDeltaReaders(String newspaperName);
     List<Object[]> findDistrictwiseDeltaReaders(String newspaperName);
     List<Object[]> findMandalwiseDeltaReaders(String newspaperName);
-    String findMostAverageBatchTime();
+    String findMostScheduledBatchTimeNewspaper(int newspaperMasterId);
 }

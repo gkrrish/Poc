@@ -104,15 +104,23 @@ public class AdminDashboardCustomRepositoryImpl implements AdminDashboardCustomR
     }
 
     @Override
-    public String findMostAverageBatchTime() {
-        Query query = entityManager.createNativeQuery("SELECT DELIVERY_TIME " +
-                "FROM (SELECT DELIVERY_TIME, COUNT(*) AS cnt " +
-                "FROM MASTER_BATCH_JOBS " +
-                "GROUP BY DELIVERY_TIME " +
-                "ORDER BY cnt DESC) " +
-                "WHERE ROWNUM = 1");
+    public String findMostScheduledBatchTimeNewspaper(int newspaperMasterId) {
+        Query query = entityManager.createNativeQuery(
+            "SELECT DELIVERY_TIME " +
+            "FROM (" +
+            "   SELECT DELIVERY_TIME, ROW_NUMBER() OVER (ORDER BY COUNT(*) DESC) AS rn " +
+            "   FROM USER_SUBSCRIPTION US " +
+            "   JOIN MASTER_BATCH_JOBS MBJ ON US.batch_id = MBJ.BATCH_ID " +
+            "   JOIN MASTER_NEWSPAPER MN ON US.newspaper_master_id = MN.newspaper_master_id " +
+            "   WHERE MN.newspaper_master_id = :newspaperMasterId " +
+            "   GROUP BY DELIVERY_TIME " +
+            ") " +
+            "WHERE rn = 1"
+        );
+        query.setParameter("newspaperMasterId", newspaperMasterId);
         Object result = query.getSingleResult();
         return result != null ? result.toString() : null;
     }
+
 
 }

@@ -1,6 +1,8 @@
 package com.poc.zadminservice.service;
 
 import com.poc.zadminservice.repository.AdminDashboardRepository;
+import com.poc.master.entity.MasterNewspaper;
+import com.poc.master.repository.MasterNewspaperRepository;
 import com.poc.zadminservice.repository.AdminDashboardCustomRepository;
 import com.poc.zadminservice.response.AdminDashboardDailyReportResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminDashboardService {
@@ -17,8 +20,14 @@ public class AdminDashboardService {
 
     @Autowired
     private AdminDashboardCustomRepository customRepository;
+    
+    @Autowired
+    private MasterNewspaperRepository masterNewspaperRepository;
 
     public AdminDashboardDailyReportResponse getDailyReport(String newspaperName) {
+    	Long masterNewsPaperIdByNewspaperName = masterNewspaperRepository.findByNewspaperName(newspaperName).get().getId();
+        int masterNewsPaperId = Long.valueOf(masterNewsPaperIdByNewspaperName).intValue();
+    	
     	Long toatalDistinctUsers=customRepository.findTotalDistinctReaders(newspaperName);
         Long totalReaders = customRepository.findTotalReaders(newspaperName);
         Long todayPositiveDeltaReaders = customRepository.findTodayPositiveDeltaReaders(newspaperName);
@@ -38,8 +47,9 @@ public class AdminDashboardService {
         String mandal = mandalwiseDeltas.isEmpty() ? null : (String) mandalwiseDeltas.get(0)[0];
         Long totalPositiveDeltaInMandal = mandalwiseDeltas.isEmpty() ? 0L : ((Number) mandalwiseDeltas.get(0)[1]).longValue();
         Long totalNegativeDeltaInMandal = mandalwiseDeltas.isEmpty() ? 0L : ((Number) mandalwiseDeltas.get(0)[2]).longValue();
-
-        String preparableScheduledTime = customRepository.findMostAverageBatchTime();
+        
+        
+        String preparableScheduledTime = customRepository.findMostScheduledBatchTimeNewspaper(masterNewsPaperId);
 
         return AdminDashboardDailyReportResponse.builder()
                 .todayDate(new Date())
