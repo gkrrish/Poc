@@ -19,6 +19,7 @@ public class AdminDashboardService {
     private AdminDashboardCustomRepository customRepository;
 
     public AdminDashboardDailyReportResponse getDailyReport(String newspaperName) {
+    	Long toatalDistinctUsers=customRepository.findTotalDistinctReaders(newspaperName);
         Long totalReaders = customRepository.findTotalReaders(newspaperName);
         Long todayPositiveDeltaReaders = customRepository.findTodayPositiveDeltaReaders(newspaperName);
         Long todayNegativeDeltaReaders = customRepository.findTodayNegativeDeltaReaders(newspaperName);
@@ -42,6 +43,7 @@ public class AdminDashboardService {
 
         return AdminDashboardDailyReportResponse.builder()
                 .todayDate(new Date())
+                .toatalDistinctUsers(toatalDistinctUsers)
                 .totalReaders(totalReaders)
                 .todayPositiveDeltaReaders(todayPositiveDeltaReaders)
                 .todayNegativeDeltaReaders(todayNegativeDeltaReaders)

@@ -14,6 +14,17 @@ public class AdminDashboardCustomRepositoryImpl implements AdminDashboardCustomR
 
     @PersistenceContext
     private EntityManager entityManager;
+    
+    @Override
+    public Long findTotalDistinctReaders(String newspaperName) {
+        Query query = entityManager.createNativeQuery("SELECT COUNT(DISTINCT us.user_id) FROM USER_SUBSCRIPTION US " +
+                "JOIN MASTER_NEWSPAPER MN ON US.newspaper_master_id = MN.newspaper_master_id " +
+                "WHERE MN.newspaper_name = :newspaperName");
+        query.setParameter("newspaperName", newspaperName);
+        Object result = query.getSingleResult();
+        return result != null ? ((BigDecimal) result).longValue() : 0L;
+    }
+    
 
     @Override
     public Long findTotalReaders(String newspaperName) {
@@ -52,7 +63,7 @@ public class AdminDashboardCustomRepositoryImpl implements AdminDashboardCustomR
                 "SUM(CASE WHEN TRUNC(US.subscription_end_date) = TRUNC(CURRENT_DATE) THEN 1 ELSE 0 END) AS totalNegativeDeltaInState " +
                 "FROM USER_SUBSCRIPTION US " +
                 "JOIN USER_DETAILS UD ON US.user_id = UD.UserID " +
-                "JOIN MASTER_STATEWISE_LOCATIONS MSL ON UD.Location = MSL.location_id " +
+                "JOIN MASTER_STATEWISE_LOCATIONS MSL ON UD.Location = MSL.location_name " +
                 "JOIN MASTER_STATES MS ON MSL.state_id = MS.state_id " +
                 "JOIN MASTER_NEWSPAPER MN ON US.newspaper_master_id = MN.newspaper_master_id " +
                 "WHERE MN.newspaper_name = :newspaperName " +
@@ -60,9 +71,6 @@ public class AdminDashboardCustomRepositoryImpl implements AdminDashboardCustomR
         query.setParameter("newspaperName", newspaperName);
         return query.getResultList();
     }
-    
-    
-
 
     @Override
     public List<Object[]> findDistrictwiseDeltaReaders(String newspaperName) {
@@ -71,9 +79,10 @@ public class AdminDashboardCustomRepositoryImpl implements AdminDashboardCustomR
                 "SUM(CASE WHEN TRUNC(US.subscription_end_date) = TRUNC(CURRENT_DATE) THEN 1 ELSE 0 END) AS totalNegativeDeltaInDistrict " +
                 "FROM USER_SUBSCRIPTION US " +
                 "JOIN USER_DETAILS UD ON US.user_id = UD.UserID " +
-                "JOIN MASTER_STATEWISE_LOCATIONS MSL ON UD.Location = MSL.location_id " +
+                "JOIN MASTER_STATEWISE_LOCATIONS MSL ON UD.Location = MSL.location_name " +
                 "JOIN MASTER_DISTRICTS MD ON MSL.district_id = MD.district_id " +
-                "WHERE US.newspaper_master_id = (SELECT newspaper_master_id FROM MASTER_NEWSPAPER WHERE newspaper_name = :newspaperName) " +
+                "JOIN MASTER_NEWSPAPER MN ON US.newspaper_master_id = MN.newspaper_master_id " +
+                "WHERE MN.newspaper_name = :newspaperName " +
                 "GROUP BY MD.district_name");
         query.setParameter("newspaperName", newspaperName);
         return query.getResultList();
@@ -86,7 +95,7 @@ public class AdminDashboardCustomRepositoryImpl implements AdminDashboardCustomR
                 "SUM(CASE WHEN TRUNC(US.subscription_end_date) = TRUNC(CURRENT_DATE) THEN 1 ELSE 0 END) AS totalNegativeDeltaInMandal " +
                 "FROM USER_SUBSCRIPTION US " +
                 "JOIN USER_DETAILS UD ON US.user_id = UD.UserID " +
-                "JOIN MASTER_STATEWISE_LOCATIONS MSL ON UD.Location = MSL.location_id " +
+                "JOIN MASTER_STATEWISE_LOCATIONS MSL ON UD.Location = MSL.location_name " +
                 "JOIN MASTER_MANDALS MM ON MSL.mandal_id = MM.mandal_id " +
                 "WHERE US.newspaper_master_id = (SELECT newspaper_master_id FROM MASTER_NEWSPAPER WHERE newspaper_name = :newspaperName) " +
                 "GROUP BY MM.mandal_name");
@@ -97,11 +106,13 @@ public class AdminDashboardCustomRepositoryImpl implements AdminDashboardCustomR
     @Override
     public String findMostAverageBatchTime() {
         Query query = entityManager.createNativeQuery("SELECT DELIVERY_TIME " +
+                "FROM (SELECT DELIVERY_TIME, COUNT(*) AS cnt " +
                 "FROM MASTER_BATCH_JOBS " +
                 "GROUP BY DELIVERY_TIME " +
-                "ORDER BY COUNT(*) DESC " +
-                "FETCH FIRST 1 ROWS ONLY");
+                "ORDER BY cnt DESC) " +
+                "WHERE ROWNUM = 1");
         Object result = query.getSingleResult();
         return result != null ? result.toString() : null;
     }
+
 }

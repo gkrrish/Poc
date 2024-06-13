@@ -18,6 +18,7 @@ import lombok.ToString;
 public class AdminDashboardDailyReportResponse {
 	
 	private Date todayDate;
+	private Long toatalDistinctUsers;
     private Long totalReaders;
     private Long todayPositiveDeltaReaders;
     private Long todayNegativeDeltaReaders;
