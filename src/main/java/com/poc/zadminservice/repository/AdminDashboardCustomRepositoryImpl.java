@@ -16,48 +16,52 @@ public class AdminDashboardCustomRepositoryImpl implements AdminDashboardCustomR
     private EntityManager entityManager;
     
     @Override
-    public Long findTotalDistinctReaders(String newspaperName) {
-        Query query = entityManager.createNativeQuery("SELECT COUNT(DISTINCT us.user_id) FROM USER_SUBSCRIPTION US " +
-                "JOIN MASTER_NEWSPAPER MN ON US.newspaper_master_id = MN.newspaper_master_id " +
-                "WHERE MN.newspaper_name = :newspaperName");
-        query.setParameter("newspaperName", newspaperName);
+    public Long findTotalDistinctReaders(int newspaperMasterId) {
+        Query query = entityManager.createNativeQuery(
+            "SELECT COUNT(DISTINCT us.user_id) " +
+            "FROM USER_SUBSCRIPTION US " +
+            "WHERE US.newspaper_master_id = :newspaperMasterId"
+        );
+        query.setParameter("newspaperMasterId", newspaperMasterId);
         Object result = query.getSingleResult();
         return result != null ? ((BigDecimal) result).longValue() : 0L;
     }
     
 
     @Override
-    public Long findTotalReaders(String newspaperName) {
-        Query query = entityManager.createNativeQuery("SELECT COUNT(*) FROM USER_SUBSCRIPTION US " +
-                "JOIN MASTER_NEWSPAPER MN ON US.newspaper_master_id = MN.newspaper_master_id " +
-                "WHERE MN.newspaper_name = :newspaperName");
-        query.setParameter("newspaperName", newspaperName);
+    public Long findTotalReaders(int newspaperMasterId) {
+        Query query = entityManager.createNativeQuery(
+            "SELECT COUNT(*) " +
+            "FROM USER_SUBSCRIPTION US " +
+            "WHERE US.newspaper_master_id = :newspaperMasterId"
+        );
+        query.setParameter("newspaperMasterId", newspaperMasterId);
         Object result = query.getSingleResult();
         return result != null ? ((BigDecimal) result).longValue() : 0L;
     }
 
     @Override
-    public Long findTodayPositiveDeltaReaders(String newspaperName) {
+    public Long findTodayPositiveDeltaReaders(int newspaperMasterId) {
         Query query = entityManager.createNativeQuery("SELECT COUNT(*) FROM USER_SUBSCRIPTION " +
                 "WHERE TRUNC(subscription_start_date) = TRUNC(CURRENT_DATE) " +
-                "AND newspaper_master_id = (SELECT newspaper_master_id FROM MASTER_NEWSPAPER WHERE newspaper_name = :newspaperName)");
-        query.setParameter("newspaperName", newspaperName);
+                "AND newspaper_master_id = :newspaperMasterId");
+        query.setParameter("newspaperMasterId", newspaperMasterId);
         Object result = query.getSingleResult();
         return result != null ? ((BigDecimal) result).longValue() : 0L;
     }
 
     @Override
-    public Long findTodayNegativeDeltaReaders(String newspaperName) {
+    public Long findTodayNegativeDeltaReaders(int newspaperMasterId) {
         Query query = entityManager.createNativeQuery("SELECT COUNT(*) FROM USER_SUBSCRIPTION " +
                 "WHERE TRUNC(subscription_end_date) = TRUNC(CURRENT_DATE) " +
-                "AND newspaper_master_id = (SELECT newspaper_master_id FROM MASTER_NEWSPAPER WHERE newspaper_name = :newspaperName)");
-        query.setParameter("newspaperName", newspaperName);
+                "AND newspaper_master_id = :newspaperMasterId");
+        query.setParameter("newspaperMasterId", newspaperMasterId);
         Object result = query.getSingleResult();
         return result != null ? ((BigDecimal) result).longValue() : 0L;
     }
 
     @Override
-    public List<Object[]> findStatewiseDeltaReaders(String newspaperName) {
+    public List<Object[]> findStatewiseDeltaReaders(int newspaperMasterId) {
         Query query = entityManager.createNativeQuery("SELECT MS.state_name AS state, " +
                 "SUM(CASE WHEN TRUNC(US.subscription_start_date) = TRUNC(CURRENT_DATE) THEN 1 ELSE 0 END) AS totalPositiveDeltaInState, " +
                 "SUM(CASE WHEN TRUNC(US.subscription_end_date) = TRUNC(CURRENT_DATE) THEN 1 ELSE 0 END) AS totalNegativeDeltaInState " +
@@ -65,15 +69,14 @@ public class AdminDashboardCustomRepositoryImpl implements AdminDashboardCustomR
                 "JOIN USER_DETAILS UD ON US.user_id = UD.UserID " +
                 "JOIN MASTER_STATEWISE_LOCATIONS MSL ON UD.Location = MSL.location_name " +
                 "JOIN MASTER_STATES MS ON MSL.state_id = MS.state_id " +
-                "JOIN MASTER_NEWSPAPER MN ON US.newspaper_master_id = MN.newspaper_master_id " +
-                "WHERE MN.newspaper_name = :newspaperName " +
+                "WHERE US.newspaper_master_id = :newspaperMasterId " +
                 "GROUP BY MS.state_name");
-        query.setParameter("newspaperName", newspaperName);
+        query.setParameter("newspaperMasterId", newspaperMasterId);
         return query.getResultList();
     }
 
     @Override
-    public List<Object[]> findDistrictwiseDeltaReaders(String newspaperName) {
+    public List<Object[]> findDistrictwiseDeltaReaders(int newspaperMasterId) {
         Query query = entityManager.createNativeQuery("SELECT MD.district_name AS district, " +
                 "SUM(CASE WHEN TRUNC(US.subscription_start_date) = TRUNC(CURRENT_DATE) THEN 1 ELSE 0 END) AS totalPositiveDeltaInDistrict, " +
                 "SUM(CASE WHEN TRUNC(US.subscription_end_date) = TRUNC(CURRENT_DATE) THEN 1 ELSE 0 END) AS totalNegativeDeltaInDistrict " +
@@ -81,15 +84,14 @@ public class AdminDashboardCustomRepositoryImpl implements AdminDashboardCustomR
                 "JOIN USER_DETAILS UD ON US.user_id = UD.UserID " +
                 "JOIN MASTER_STATEWISE_LOCATIONS MSL ON UD.Location = MSL.location_name " +
                 "JOIN MASTER_DISTRICTS MD ON MSL.district_id = MD.district_id " +
-                "JOIN MASTER_NEWSPAPER MN ON US.newspaper_master_id = MN.newspaper_master_id " +
-                "WHERE MN.newspaper_name = :newspaperName " +
+                "WHERE US.newspaper_master_id = :newspaperMasterId " +
                 "GROUP BY MD.district_name");
-        query.setParameter("newspaperName", newspaperName);
+        query.setParameter("newspaperMasterId", newspaperMasterId);
         return query.getResultList();
     }
 
     @Override
-    public List<Object[]> findMandalwiseDeltaReaders(String newspaperName) {
+    public List<Object[]> findMandalwiseDeltaReaders(int newspaperMasterId) {
         Query query = entityManager.createNativeQuery("SELECT MM.mandal_name AS mandal, " +
                 "SUM(CASE WHEN TRUNC(US.subscription_start_date) = TRUNC(CURRENT_DATE) THEN 1 ELSE 0 END) AS totalPositiveDeltaInMandal, " +
                 "SUM(CASE WHEN TRUNC(US.subscription_end_date) = TRUNC(CURRENT_DATE) THEN 1 ELSE 0 END) AS totalNegativeDeltaInMandal " +
@@ -97,9 +99,9 @@ public class AdminDashboardCustomRepositoryImpl implements AdminDashboardCustomR
                 "JOIN USER_DETAILS UD ON US.user_id = UD.UserID " +
                 "JOIN MASTER_STATEWISE_LOCATIONS MSL ON UD.Location = MSL.location_name " +
                 "JOIN MASTER_MANDALS MM ON MSL.mandal_id = MM.mandal_id " +
-                "WHERE US.newspaper_master_id = (SELECT newspaper_master_id FROM MASTER_NEWSPAPER WHERE newspaper_name = :newspaperName) " +
+                "WHERE US.newspaper_master_id = :newspaperMasterId " +
                 "GROUP BY MM.mandal_name");
-        query.setParameter("newspaperName", newspaperName);
+        query.setParameter("newspaperMasterId", newspaperMasterId);
         return query.getResultList();
     }
 

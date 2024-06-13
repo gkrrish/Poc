@@ -3,12 +3,12 @@ package com.poc.zadminservice.repository;
 import java.util.List;
 
 public interface AdminDashboardCustomRepository {
-	Long findTotalDistinctReaders(String newspaperName);
-    Long findTotalReaders(String newspaperName);
-    Long findTodayPositiveDeltaReaders(String newspaperName);
-    Long findTodayNegativeDeltaReaders(String newspaperName);
-    List<Object[]> findStatewiseDeltaReaders(String newspaperName);
-    List<Object[]> findDistrictwiseDeltaReaders(String newspaperName);
-    List<Object[]> findMandalwiseDeltaReaders(String newspaperName);
+	Long findTotalDistinctReaders(int newspaperMasterId);
+    Long findTotalReaders(int newspaperMasterId);
+    Long findTodayPositiveDeltaReaders(int newspaperMasterId);
+    Long findTodayNegativeDeltaReaders(int newspaperMasterId);
+    List<Object[]> findStatewiseDeltaReaders(int newspaperMasterId);
+    List<Object[]> findDistrictwiseDeltaReaders(int newspaperMasterId);
+    List<Object[]> findMandalwiseDeltaReaders(int newspaperMasterId);
     String findMostScheduledBatchTimeNewspaper(int newspaperMasterId);
 }
