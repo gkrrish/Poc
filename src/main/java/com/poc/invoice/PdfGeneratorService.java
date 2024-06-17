@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import com.itextpdf.io.image.ImageData;
@@ -29,8 +31,18 @@ import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
 
+import jakarta.annotation.PostConstruct;
+
 @Service
 public class PdfGeneratorService {
+	
+	@Autowired
+    private ResourceLoader resourceLoader;
+	
+	@PostConstruct
+    private void init() throws IOException {
+        loadFonts();
+    }
 
     private PdfFont fontMedium;
     private PdfFont fontLight;
@@ -46,8 +58,8 @@ public class PdfGeneratorService {
         setupDocument(document, pdfDoc);
         loadFonts();
         
-        addHeaderImage(document, "/Poc/src/main/resources/images/invoicelogo.jpg");
-        addHeaderImage(document, "/Poc/src/main/resources/images/invoiceheading.PNG");
+        addHeaderImage(document, "classpath:images/invoicelogo.jpg");
+        addHeaderImage(document, "classpath:images/invoiceheading.PNG");
         
         addInvoiceDetails(document, invoice);
         
@@ -57,7 +69,7 @@ public class PdfGeneratorService {
         
         addPaymentDetails(document, invoice);
         
-        addFooterImage(document, "/Poc/src/main/resources/images/invoicelogo.jpg");
+        addFooterImage(document, "classpath:images/invoicelogo.jpg");
         
         addThanksAndSignature(document, invoice);
         
@@ -78,16 +90,15 @@ public class PdfGeneratorService {
     }
 
     private void loadFonts() throws IOException {
-        String poppinsMedium = "/Poc/src/main/resources/fonts/Poppins-Medium.ttf";
-        String poppinsLight = "/Poc/src/main/resources/fonts/Poppins-Light.ttf";
+        String poppinsMedium = resourceLoader.getResource("classpath:fonts/Poppins-Medium.ttf").getFile().getPath();
+        String poppinsLight = resourceLoader.getResource("classpath:fonts/Poppins-Light.ttf").getFile().getPath();
         fontMedium = PdfFontFactory.createFont(poppinsMedium, PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED);
         fontLight = PdfFontFactory.createFont(poppinsLight, PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED);
     }
 
     private void addHeaderImage(Document document, String imagePath) throws IOException {
-        ImageData imgData = ImageDataFactory.create(imagePath);
-        Image img = new Image(imgData);
-        document.add(img);
+        Image image = new Image(ImageDataFactory.create(resourceLoader.getResource(imagePath).getFile().getPath()));
+        document.add(image);
     }
 
     private void addInvoiceDetails(Document document, InvoiceResponse invoice) {
@@ -279,12 +290,10 @@ public class PdfGeneratorService {
         }
     }
     
-
     private void addFooterImage(Document document, String imagePath) throws IOException {
-        ImageData footerImgData = ImageDataFactory.create(imagePath);
-        Image footerImg = new Image(footerImgData);
-        document.add(footerImg);
-
+        Image image = new Image(ImageDataFactory.create(resourceLoader.getResource(imagePath).getFile().getPath()));
+        document.add(image);
+        
         document.add(new Paragraph().setFixedLeading(10));
     }
     
