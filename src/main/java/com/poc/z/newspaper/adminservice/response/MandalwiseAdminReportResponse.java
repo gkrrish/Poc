@@ -1,7 +1,5 @@
 package com.poc.z.newspaper.adminservice.response;
 
-import java.util.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,12 +13,11 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 @Builder
-public class AdminDashboardDailyReportResponse {
-
-	private Date todayDate;
-	private Long totalDistinctUsers;
-	private Long totalReaders;
-	private Long todayPositiveDeltaReaders;
-	private Long todayNegativeDeltaReaders;
-	private String preparableScheduledTime;
+public class MandalwiseAdminReportResponse {
+    private String mandalName;
+    private Long mandalwiseDistinctUsers;
+    private Long mandalwiseReaders;
+    private Long totalPositiveDeltaInMandal;
+    private Long totalNegativeDeltaInMandal;
+    private String mandalwisePreparableTime;
 }

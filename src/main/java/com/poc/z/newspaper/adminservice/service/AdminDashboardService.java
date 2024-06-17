@@ -1,70 +1,41 @@
 package com.poc.z.newspaper.adminservice.service;
 
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.poc.master.repository.MasterNewspaperRepository;
 import com.poc.z.newspaper.adminservice.repository.AdminDashboardCustomRepository;
-import com.poc.z.newspaper.adminservice.repository.AdminDashboardRepository;
 import com.poc.z.newspaper.adminservice.response.AdminDashboardDailyReportResponse;
 
 @Service
 public class AdminDashboardService {
 
     @Autowired
-    private AdminDashboardRepository repository;
-
-    @Autowired
-    private AdminDashboardCustomRepository customRepository;
+    private AdminDashboardCustomRepository adminDashboardRepository;
     
     @Autowired
     private MasterNewspaperRepository masterNewspaperRepository;
 
     public AdminDashboardDailyReportResponse getDailyReport(String newspaperName) {
+    	//make it util method masterNewspaerId
     	Long masterNewsPaperIdByNewspaperName = masterNewspaperRepository.findByNewspaperName(newspaperName).get().getId();
         int masterNewsPaperId = Long.valueOf(masterNewsPaperIdByNewspaperName).intValue();
     	
-    	Long toatalDistinctUsers=customRepository.findTotalDistinctReaders(masterNewsPaperId);
-        Long totalReaders = customRepository.findTotalReaders(masterNewsPaperId);
-        Long todayPositiveDeltaReaders = customRepository.findTodayPositiveDeltaReaders(masterNewsPaperId);
-        Long todayNegativeDeltaReaders = customRepository.findTodayNegativeDeltaReaders(masterNewsPaperId);
+    	Long toatalDistinctUsers=adminDashboardRepository.findTotalDistinctReaders(masterNewsPaperId);
+        Long totalReaders = adminDashboardRepository.findTotalReaders(masterNewsPaperId);
+        Long todayPositiveDeltaReaders = adminDashboardRepository.findTodayPositiveDeltaReaders(masterNewsPaperId);
+        Long todayNegativeDeltaReaders = adminDashboardRepository.findTodayNegativeDeltaReaders(masterNewsPaperId);
         
-        List<Object[]> statewiseDeltas = customRepository.findStatewiseDeltaReaders(masterNewsPaperId);
-        String state = statewiseDeltas.isEmpty() ? null : (String) statewiseDeltas.get(0)[0];
-        Long totalPositiveDeltaInState = statewiseDeltas.isEmpty() ? 0L : ((Number) statewiseDeltas.get(0)[1]).longValue();
-        Long totalNegativeDeltaInState = statewiseDeltas.isEmpty() ? 0L : ((Number) statewiseDeltas.get(0)[2]).longValue();
-        
-        List<Object[]> districtwiseDeltas = customRepository.findDistrictwiseDeltaReaders(masterNewsPaperId);
-        String district = districtwiseDeltas.isEmpty() ? null : (String) districtwiseDeltas.get(0)[0];
-        Long totalPositiveDeltaInDistrict = districtwiseDeltas.isEmpty() ? 0L : ((Number) districtwiseDeltas.get(0)[1]).longValue();
-        Long totalNegativeDeltaInDistrict = districtwiseDeltas.isEmpty() ? 0L : ((Number) districtwiseDeltas.get(0)[2]).longValue();
-        
-        List<Object[]> mandalwiseDeltas = customRepository.findMandalwiseDeltaReaders(masterNewsPaperId);
-        String mandal = mandalwiseDeltas.isEmpty() ? null : (String) mandalwiseDeltas.get(0)[0];
-        Long totalPositiveDeltaInMandal = mandalwiseDeltas.isEmpty() ? 0L : ((Number) mandalwiseDeltas.get(0)[1]).longValue();
-        Long totalNegativeDeltaInMandal = mandalwiseDeltas.isEmpty() ? 0L : ((Number) mandalwiseDeltas.get(0)[2]).longValue();
-        
-        
-        String preparableScheduledTime = customRepository.findMostScheduledBatchTimeNewspaper(masterNewsPaperId);
+        String preparableScheduledTime = adminDashboardRepository.findMostScheduledBatchTimeNewspaper(masterNewsPaperId);
 
         return AdminDashboardDailyReportResponse.builder()
                 .todayDate(new Date())
-                .toatalDistinctUsers(toatalDistinctUsers)
+                .totalDistinctUsers(toatalDistinctUsers)
                 .totalReaders(totalReaders)
                 .todayPositiveDeltaReaders(todayPositiveDeltaReaders)
                 .todayNegativeDeltaReaders(todayNegativeDeltaReaders)
-                .state(state)
-                .totalPositiveDeltaInState(totalPositiveDeltaInState)
-                .totalNegativeDeltaInState(totalNegativeDeltaInState)
-                .district(district)
-                .totalPositiveDeltaInDistrict(totalPositiveDeltaInDistrict)
-                .totalNegativeDeltaInDistrict(totalNegativeDeltaInDistrict)
-                .mandal(mandal)
-                .totalPositiveDeltaInMandal(totalPositiveDeltaInMandal)
-                .totalNegativeDeltaInMandal(totalNegativeDeltaInMandal)
                 .preparableScheduledTime(preparableScheduledTime)
                 .build();
     }

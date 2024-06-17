@@ -46,8 +46,8 @@ public class PdfGeneratorService {
         setupDocument(document, pdfDoc);
         loadFonts();
         
-        addHeaderImage(document, "D:\\invoicelogo.jpg");
-        addHeaderImage(document, "D:\\invoiceheading.PNG");
+        addHeaderImage(document, "/Poc/src/main/resources/images/invoicelogo.jpg");
+        addHeaderImage(document, "/Poc/src/main/resources/images/invoiceheading.PNG");
         
         addInvoiceDetails(document, invoice);
         
@@ -57,7 +57,7 @@ public class PdfGeneratorService {
         
         addPaymentDetails(document, invoice);
         
-        addFooterImage(document, "D:\\invoicelogo.jpg");
+        addFooterImage(document, "/Poc/src/main/resources/images/invoicelogo.jpg");
         
         addThanksAndSignature(document, invoice);
         
@@ -78,8 +78,8 @@ public class PdfGeneratorService {
     }
 
     private void loadFonts() throws IOException {
-        String poppinsMedium = "D:\\FontsFree-Net-Poppins-Medium.ttf";
-        String poppinsLight = "D:\\FontsFree-Net-Poppins-Light.ttf";
+        String poppinsMedium = "/Poc/src/main/resources/fonts/Poppins-Medium.ttf";
+        String poppinsLight = "/Poc/src/main/resources/fonts/Poppins-Light.ttf";
         fontMedium = PdfFontFactory.createFont(poppinsMedium, PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED);
         fontLight = PdfFontFactory.createFont(poppinsLight, PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED);
     }

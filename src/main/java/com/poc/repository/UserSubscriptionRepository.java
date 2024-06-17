@@ -17,5 +17,4 @@ public interface UserSubscriptionRepository extends JpaRepository<UserSubscripti
 	@Query("SELECT us FROM UserSubscription us WHERE us.id.user.userid = :userId AND us.id.vendor.id.newspaperId = :newspaperId")
 	Optional<UserSubscription> findByUserIdAndNewspaperId(@Param("userId") Long userId, @Param("newspaperId") Long newspaperId);
 	
-	
 }
