@@ -14,7 +14,7 @@ import com.poc.z.newspaper.adminservice.repository.CustomStateDashboardReportRep
 import com.poc.z.newspaper.adminservice.response.StatewiseAdminReportResponse;
 
 @Service
-public class AdminDashboardDistrictService {
+public class AdminDashboardStatewiseService {
 	
 	@Autowired
     private CustomStateDashboardReportRepository customStateDashboardReportRepository;
