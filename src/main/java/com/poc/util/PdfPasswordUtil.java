@@ -15,7 +15,7 @@ public class PdfPasswordUtil {
 	public static void createPasswordProtectedPdfsForUsers(String srcPath, String destDir, List<String> users, String ownerPassword, String fileName) throws IOException, java.io.IOException {
         for (String user : users) {
             String userPassword = user; // Assuming user password is the mobile number
-            String destPath = destDir + File.separator + fileName+ ".pdf";
+            String destPath = destDir + File.separator + fileName;//+ ".pdf";
             createPasswordProtectedPdf(srcPath, destPath, userPassword, ownerPassword);
         }
     }
