@@ -1,6 +1,7 @@
 package com.poc.z.newspaper.adminservice.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,7 @@ public class AdminDashboardDistrictService {
 	@Autowired
 	private UserSubscriptionService userSubscriptionService;
 
-    public List<StatewiseAdminReportResponse> getStatewiseReport(String newspaperName) {
+    public List<StatewiseAdminReportResponse> getStatewiseReport(String newspaperName, Date subscriptionStartDate, Date searchSubscriptionUntilDate, Date subscriptionFromDate, Date subscriptionEndDate) {
     	
     	Long masterNewsPaperIdByNewspaperName = masterNewspaperRepository.findByNewspaperName(newspaperName).get().getId();
         int newspaperMasterId = Long.valueOf(masterNewsPaperIdByNewspaperName).intValue();
@@ -35,8 +36,10 @@ public class AdminDashboardDistrictService {
         for (String stateName : stateNames) {
             Long distinctUsers = customStateDashboardReportRepository.findStatewiseDistinctUsers(stateName, newspaperMasterId);
             Long readers = customStateDashboardReportRepository.findStatewiseReaders(stateName, newspaperMasterId);
-            Long positiveDelta = customStateDashboardReportRepository.findTotalPositiveDeltaInState(stateName, newspaperMasterId);
-            Long negativeDelta = customStateDashboardReportRepository.findTotalNegativeDeltaInState(stateName, newspaperMasterId);
+            Long positiveDelta = customStateDashboardReportRepository.findTotalPositiveDeltaInState(stateName, newspaperMasterId,subscriptionStartDate,searchSubscriptionUntilDate);
+            Long negativeDelta = customStateDashboardReportRepository.findTotalNegativeDeltaInState(stateName, newspaperMasterId,subscriptionFromDate,subscriptionEndDate);
+            String statewiseScheduledTime = customStateDashboardReportRepository.findMostScheduledBatchTimeNewspaperInStatewise(stateName, newspaperMasterId);
+            
 
             StatewiseAdminReportResponse response = StatewiseAdminReportResponse.builder()
                     .stateName(stateName)
@@ -44,6 +47,7 @@ public class AdminDashboardDistrictService {
                     .statewiseReaders(readers)
                     .totalPositiveDeltaInState(positiveDelta)
                     .totalNegativeDeltaInState(negativeDelta)
+                    .statewisePreparableTime(statewiseScheduledTime)
                     .build();
 
             statewiseReportResponses.add(response);

@@ -1,5 +1,6 @@
 package com.poc.z.newspaper.adminservice.controller;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,18 +18,23 @@ public class AdminDashboardController {
 
 	@Autowired
 	private AdminDashboardService service;
-	
+
 	@Autowired
-    private AdminDashboardDistrictService adminDashboardDistrictService;
+	private AdminDashboardDistrictService adminDashboardDistrictService;
 
 	@GetMapping("/admin/dashboard/daily-report")
 	public AdminDashboardDailyReportResponse getDailyReport(@RequestParam String newspaperName) {
 		return service.getDailyReport(newspaperName);
 	}
-	
+
 	@GetMapping("/statewise-report")
-    public List<StatewiseAdminReportResponse> getStatewiseReport(@RequestParam String newspaperName) {
-        return adminDashboardDistrictService.getStatewiseReport(newspaperName);
-    }
+	public List<StatewiseAdminReportResponse> getStatewiseReport(@RequestParam String newspaperName,
+																@RequestParam Date subscriptionStartDate, 
+																@RequestParam Date searchSubscriptionUntilDate,
+																@RequestParam Date subscriptionFromDate,
+																@RequestParam Date subscriptionEndDate
+			) {
+		return adminDashboardDistrictService.getStatewiseReport(newspaperName,subscriptionStartDate,searchSubscriptionUntilDate,subscriptionFromDate,subscriptionEndDate);
+	}
 
 }
