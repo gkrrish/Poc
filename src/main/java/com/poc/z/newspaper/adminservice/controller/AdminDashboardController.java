@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.poc.z.newspaper.adminservice.response.AdminDashboardDailyReportResponse;
 import com.poc.z.newspaper.adminservice.response.DistrictwiseAdminReportResponse;
+import com.poc.z.newspaper.adminservice.response.MandalwiseAdminReportResponse;
 import com.poc.z.newspaper.adminservice.response.StatewiseAdminReportResponse;
 import com.poc.z.newspaper.adminservice.service.AdminDashboardDistrictwiseService;
+import com.poc.z.newspaper.adminservice.service.AdminDashboardMandalwiseService;
 import com.poc.z.newspaper.adminservice.service.AdminDashboardService;
 import com.poc.z.newspaper.adminservice.service.AdminDashboardStatewiseService;
 
@@ -28,6 +30,9 @@ public class AdminDashboardController {
 	
 	@Autowired
 	AdminDashboardDistrictwiseService adminDashboardDistrictwiseService;
+	
+	@Autowired
+	AdminDashboardMandalwiseService adminDashboardMandalwiseService;
 
 	@GetMapping("/admin/dashboard/daily-report")
 	public AdminDashboardDailyReportResponse getDailyReport(@RequestParam String newspaperName) {
@@ -55,5 +60,17 @@ public class AdminDashboardController {
 	    
 		return adminDashboardDistrictwiseService.getDistrictwiseReport(newspaperName,subscriptionStartDate,searchSubscriptionUntilDate,subscriptionFromDate,subscriptionEndDate);
 	}
+	
+	@GetMapping("/mandalwise-report")
+    public Map<String, List<MandalwiseAdminReportResponse>> getMandalwiseReport(
+    		@RequestParam String stateName,
+            @RequestParam String newspaperName,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date subscriptionStartDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date searchSubscriptionUntilDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date subscriptionFromDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date subscriptionEndDate) {
+
+        return adminDashboardMandalwiseService.getMandalwiseReport(stateName, newspaperName, subscriptionStartDate, searchSubscriptionUntilDate, subscriptionFromDate, subscriptionEndDate);
+    }
 
 }

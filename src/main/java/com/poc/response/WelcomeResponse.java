@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class WelcomeResponse {
 
     private byte[] imageData;

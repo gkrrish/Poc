@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import jakarta.transaction.Transactional;
 
 @Repository
 public class CustomStateDashboardReportRepository {
@@ -102,5 +103,45 @@ public class CustomStateDashboardReportRepository {
         query.setParameter("newspaperMasterId", newspaperMasterId);
         Object result = query.getSingleResult();
         return result != null ? result.toString() : null;
+    }
+    
+    
+    /**
+     * NOTE : whenever we updating the UserSubscription with location change for the user, then we are going to use this, but instead of this delete the record 
+     * of the user and create the specific record also looks fine. and VENDOR and USE_SUBSCRIPTION has composite pk and pk makes circular dependency mind it. 
+     * 
+     * Your USER_SUBSCRIPTION table has a composite foreign key that references VENDORS, which itself references MASTER_STATEWISE_LOCATIONS. This might be a 
+     * bit complex but not necessarily circular. However, ensuring proper insertion order is crucial to avoid dependency issues.
+     */
+    @Transactional
+    public void updateLocationForUserSubscription(int userId, int vendeorNewspaperId, int newLocationId) {
+        // Disable the foreign key constraint
+        Query disableConstraintQuery = entityManager.createNativeQuery(
+            "ALTER TABLE USER_SUBSCRIPTION DISABLE CONSTRAINT FK_USER_SUBSCRIPTION_VENDORS"
+        );
+        disableConstraintQuery.executeUpdate();
+
+        // Update the location_id in the VENDORS table
+        Query updateVendorsQuery = entityManager.createNativeQuery(
+            "UPDATE VENDORS SET location_id = :newLocationId WHERE newspaper_id = :newspaperId AND location_id != :newLocationId"
+        );
+        updateVendorsQuery.setParameter("newLocationId", newLocationId);
+        updateVendorsQuery.setParameter("newspaperId", vendeorNewspaperId);
+        updateVendorsQuery.executeUpdate();
+
+        // Update the location_id in the USER_SUBSCRIPTION table
+        Query updateUserSubscriptionQuery = entityManager.createNativeQuery(
+            "UPDATE USER_SUBSCRIPTION SET location_id = :newLocationId WHERE user_id = :userId AND newspaper_id = :newspaperId"
+        );
+        updateUserSubscriptionQuery.setParameter("newLocationId", newLocationId);
+        updateUserSubscriptionQuery.setParameter("userId", userId);
+        updateUserSubscriptionQuery.setParameter("newspaperId", vendeorNewspaperId);
+        updateUserSubscriptionQuery.executeUpdate();
+
+        // Re-enable the foreign key constraint
+        Query enableConstraintQuery = entityManager.createNativeQuery(
+            "ALTER TABLE USER_SUBSCRIPTION ENABLE CONSTRAINT FK_USER_SUBSCRIPTION_VENDORS"
+        );
+        enableConstraintQuery.executeUpdate();
     }
 }

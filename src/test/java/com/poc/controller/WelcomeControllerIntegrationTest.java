@@ -66,7 +66,7 @@ public class WelcomeControllerIntegrationTest {
         //later modify the Object[] mechanism in the repository layer itself as per MVP, we are doing here.
 		Object[] paperOne=new Object[] {"0","+919876543210","Eenadu","Telugu","Telangana","Hyderabad","Uppal","06:30AM","10","10"};
 		Object[] paperTwo=new Object[] {"1","+919876543210","Eenadu","Telugu","Telangana","Hyderabad","Ghatkesar","07:00AM","15","10"};
-		Object[] paperThree=new Object[] {"2","+919876543210","Vaartha","Telugu","Telangana","Hyderabad","Uppal","07:30AM","10","10"};
+		Object[] paperThree=new Object[] {"2","+919876543210","Andhra Jyothi","Telugu","Telangana","Hyderabad","Uppal","07:30AM","10","10"};
 		List<Object[]> paperList=new ArrayList<>();
 		paperList.add(paperOne);
 		paperList.add(paperTwo);

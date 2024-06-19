@@ -67,7 +67,7 @@ public class UserService {
 	
 	public ExistingUserDetails getSubscriptioinDetails(String mobileNumber) {
 		Optional<UserDetails> userDetails = userDetailsRepository.findByMobileNumber(mobileNumber);
-		if(userDetails==null) {
+		if(userDetails==null ||userDetails.isEmpty()) {
 			return new ExistingUserDetails();
 		}
 		List<Object[]> queryResults = userDetailsRepository.getUserDetailsByMobileNumber(mobileNumber);
