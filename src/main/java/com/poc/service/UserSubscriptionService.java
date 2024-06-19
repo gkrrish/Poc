@@ -61,7 +61,7 @@ public class UserSubscriptionService {
 	
 	
 	@Transactional
-    public void upsertUserSubscription(String mobileNumber, String batchTime, String mandalName, String newspaperName) {
+    public void upsertUserSubscription(String mobileNumber, String batchTime, String mandalName, String newspaperName, boolean unSubscribe) {
         Optional<UserDetails> userDetailsOptional = userDetailsRepository.findByMobileNumber(mobileNumber);
         UserDetails user = userDetailsOptional.orElseThrow(() -> new RuntimeException("User not found"));
         Long userid = user.getUserid();
@@ -79,11 +79,22 @@ public class UserSubscriptionService {
         @SuppressWarnings("unused")
 		Long batchId = batchJob.getBatchId();
 
-        Vendor vendor = vendorRepository.findVendorsByMasterIdAndLocationId(newspaperMasterId, locationId).orElseThrow(() -> new RuntimeException("Vendor not found"));
-        Long newspaperId = vendor.getId().getNewspaperId();
-
+		Vendor vendor = vendorRepository.findVendorsByMasterIdAndLocationId(newspaperMasterId, locationId)
+													.orElseThrow(() -> new RuntimeException("Vendor not found! Currently at this location/Mandal: "+ mandalName + " newspaper not present."));
+		Long newspaperId = vendor.getId().getNewspaperId();
+		
+		//NOTE : Vendor table should be updated through ADMINSTRATOR of this application/Marketing team. not the user nor anybody. 
+		//because Vendor table has the information of which are the papers are published by the vendors on which location those things will be taken from official resources.
+		//for any worst case scenario force full update of the vendor and User-subscription details 
+		if(unSubscribe==true) {
+			deleteUserSubscription(userid, newspaperId);
+		}else {
         saveOrUpdateUserSubscription(userid, newspaperId, user, vendor, batchJob);
+		}
     }
+	
+	
+	
 	//if these inputs are kept in cache then directly call this method, while user selecting the options try to keep in cache to reduce the calls to database.
 	public void saveOrUpdateUserSubscription(Long userId, Long newspaperId, UserDetails user, Vendor vendor, BatchJob batchJob) {
 	    Optional<UserSubscription> existingSubscription = userSubscriptionRepository.findByUserIdAndNewspaperId(userId, newspaperId);
@@ -107,6 +118,13 @@ public class UserSubscriptionService {
 	    }
 	}
 
+	public void deleteUserSubscription(Long userId, Long newspaperId) {
+        Optional<UserSubscription> existingSubscription = userSubscriptionRepository.findByUserIdAndNewspaperId(userId, newspaperId);
+        
+        existingSubscription.ifPresent(subscription -> {
+            userSubscriptionRepository.delete(subscription);
+        });
+    }
 	
 	  public Optional<Vendor> getVendorsByNewspaperMasterIdAndLocationId(Long newspaperMasterId, Long locationId) {
 	        return vendorRepository.findVendorsByMasterIdAndLocationId(newspaperMasterId, locationId);

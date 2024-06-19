@@ -44,9 +44,26 @@ public class UserSubscriptionController {
             @RequestParam String batchTime,
             @RequestParam String mandalName,
             @RequestParam String newspaperName) {
+		
+		newspaperName = newspaperName.trim();
+		mandalName = mandalName.trim();
         
-        userSubscriptionService.upsertUserSubscription(mobileNumber, batchTime, mandalName, newspaperName);
+        userSubscriptionService.upsertUserSubscription(mobileNumber, batchTime, mandalName, newspaperName,false);
         return ResponseEntity.ok("Subscription updated/created successfully");
+    }
+	
+	@PostMapping("/unsubscription")
+    public ResponseEntity<String> unSubscription(
+            @RequestParam String mobileNumber,
+            @RequestParam String batchTime,
+            @RequestParam String mandalName,
+            @RequestParam String newspaperName) {
+		
+		newspaperName = newspaperName.trim();
+		mandalName = mandalName.trim();
+        
+        userSubscriptionService.upsertUserSubscription(mobileNumber, batchTime, mandalName, newspaperName, true);
+        return ResponseEntity.ok("UnSubscription successfully");
     }
 	
 	
