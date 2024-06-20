@@ -27,11 +27,13 @@ import com.poc.master.repository.StateRepository;
 import com.poc.pdfservice.PdfService;
 import com.poc.repository.UserDetailsRepository;
 import com.poc.request.WelcomeRequest;
+import com.poc.response.AvailableNewspapersByMandalwise;
 import com.poc.response.ExistingUserDetails;
 import com.poc.response.UserDetailsResponse;
 import com.poc.response.WelcomeResponse;
 import com.poc.util.BatchTimePeriod;
 import com.poc.util.StringUtils;
+import com.poc.z.newspaper.adminservice.repository.CustomMandalDashboardReportRepository;
 
 @Service
 public class UserService {
@@ -52,6 +54,8 @@ public class UserService {
 	private PdfService pdfService;
 	@Autowired
 	private BatchJobRepository batchJobRepository;
+	@Autowired
+	private CustomMandalDashboardReportRepository customMandalDashboardReportRepository;
 	
 	
 	
@@ -154,5 +158,9 @@ public class UserService {
 	public List<String> getDeliveryTimesByTimePeriod(String timePeriod) {
         BatchTimePeriod period = BatchTimePeriod.fromString(timePeriod);
         return batchJobRepository.findDeliveryTimesInRange(period.getStartId(), period.getEndId());
+    }
+	
+	public AvailableNewspapersByMandalwise getAvailableNewspapersByMandalwise(String stateName, String districtName) {
+        return customMandalDashboardReportRepository.getAvailableNewspapersByMandalwise(stateName, districtName);
     }
 }

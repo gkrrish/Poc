@@ -11,25 +11,46 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.poc.entity.UserDetails;
+import com.poc.master.entity.Vendor;
+import com.poc.master.entity.VendorDetails;
+import com.poc.request.CreateVendorDetailsRequest;
+import com.poc.request.CreateVendorRequest;
 import com.poc.request.WelcomeRequest;
+import com.poc.response.AvailableNewspapersByMandalwise;
+import com.poc.response.ExistingUserDetails;
 import com.poc.service.UserService;
+import com.poc.service.VendorService;
 
 @RestController
 public class UserController {
 
 	@Autowired
 	private UserService userService;
+	@Autowired
+    private VendorService vendorService;
 
 	@PostMapping("/welcome") // fake charges?
 	@ResponseStatus
 	public ResponseEntity<?> welcomeUser(@RequestBody WelcomeRequest request) throws IOException {
 		return userService.processWelcomeRequest(request);
 	}
+	
+	@GetMapping("/user-subscription-details-ui/{mobileNumber}")
+	@ResponseStatus
+	public ExistingUserDetails getUserSubscriptionDetailsForUI(@PathVariable String mobileNumber) throws IOException {
+		return userService.getSubscriptioinDetails(mobileNumber);
+	}
+	
+	 @GetMapping("/available-newspapers-by-mandal")
+	    public AvailableNewspapersByMandalwise getAvailableNewspapersByMandalwise(@RequestParam String stateName,@RequestParam String districtName) {
+	        return userService.getAvailableNewspapersByMandalwise(stateName, districtName);
+	 }
 
 	@GetMapping("/states/{mobileNumber}")
 	@ResponseStatus(value = HttpStatus.OK)
@@ -73,6 +94,18 @@ public class UserController {
     @ResponseBody
     public List<String> getBatchIds(@PathVariable String timePeriod) {
         return userService.getDeliveryTimesByTimePeriod(timePeriod);
+    }
+	
+	//admin-access
+	@PostMapping("/create-vendor-details")
+    public VendorDetails createVendorDetails(@RequestBody CreateVendorDetailsRequest request) {
+        return vendorService.createVendorDetails(request);
+    }
+	
+	// admin-access
+	@PostMapping("/create-new-available-mandal-for-newspaper")
+    public Vendor createVendor(@RequestBody CreateVendorRequest request) {
+        return vendorService.createVendor(request);
     }
 	
 }

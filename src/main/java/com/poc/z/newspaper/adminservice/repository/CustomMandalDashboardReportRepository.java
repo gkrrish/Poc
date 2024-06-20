@@ -2,8 +2,12 @@ package com.poc.z.newspaper.adminservice.repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
+
+import com.poc.response.AvailableNewspapersByMandalwise;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -135,5 +139,35 @@ public class CustomMandalDashboardReportRepository {
         query.setParameter("stateName", stateName);
         query.setParameter("newspaperMasterId", newspaperMasterId);
         return query.getResultList();
+    }
+    
+    public AvailableNewspapersByMandalwise getAvailableNewspapersByMandalwise(String stateName, String districtName) {
+        Query query = entityManager.createNativeQuery(
+                "SELECT mn.newspaper_name, mm.mandal_name " +
+                        "FROM VENDORS v " +
+                        "JOIN MASTER_NEWSPAPER mn ON v.newspaper_master_id = mn.newspaper_master_id " +
+                        "JOIN MASTER_STATEWISE_LOCATIONS msl ON v.location_id = msl.location_id " +
+                        "JOIN MASTER_MANDALS mm ON msl.mandal_id = mm.mandal_id " +
+                        "JOIN MASTER_DISTRICTS md ON msl.district_id = md.district_id " +
+                        "JOIN MASTER_STATES ms ON msl.state_id = ms.state_id " +
+                        "WHERE ms.state_name = :stateName " +
+                        "AND md.district_name = :districtName"
+        );
+        query.setParameter("stateName", stateName);
+        query.setParameter("districtName", districtName);
+
+        List<Object[]> result = query.getResultList();
+
+        Map<String, List<String>> availableMandals = result.stream()
+                .collect(Collectors.groupingBy(
+                        row -> (String) row[0], // newspaper_name
+                        Collectors.mapping(row -> (String) row[1], Collectors.toList()) // mandal_name
+                ));
+
+        AvailableNewspapersByMandalwise response = new AvailableNewspapersByMandalwise();
+        response.setStateName(stateName);
+        response.setAvailableMandals(availableMandals);
+
+        return response;
     }
 }
