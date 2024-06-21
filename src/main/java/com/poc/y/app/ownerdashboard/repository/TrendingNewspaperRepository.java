@@ -55,7 +55,7 @@ public class TrendingNewspaperRepository {
                         "FROM USER_SUBSCRIPTION us " +
                         "JOIN VENDORS v ON us.newspaper_id = v.newspaper_id " +
                         "JOIN MASTER_NEWSPAPER mn ON v.newspaper_master_id = mn.newspaper_master_id " +
-                        "JOIN MASTER_NEWS_LANGUAGES mnl ON mn.language_id = mnl.language_id " +
+                        "JOIN MASTER_NEWS_LANGUAGES mnl ON v.newspaper_language = mnl.language_id " +
                         "WHERE us.subscription_start_date BETWEEN :startDate AND :endDate " +
                         "AND mnl.language_name = :language " +
                         "GROUP BY mn.newspaper_name " +
@@ -76,7 +76,7 @@ public class TrendingNewspaperRepository {
                 ))
                 .collect(Collectors.toList());
     }
-    
+
 
     public List<TrendingNewspaperResponse> getTopTenTrendingNewspapersByLanguage(Date startDate, Date endDate, String language) {
         Query query = entityManager.createNativeQuery(
@@ -85,7 +85,7 @@ public class TrendingNewspaperRepository {
                 "FROM USER_SUBSCRIPTION us " +
                 "JOIN VENDORS v ON us.newspaper_id = v.newspaper_id " +
                 "JOIN MASTER_NEWSPAPER mn ON v.newspaper_master_id = mn.newspaper_master_id " +
-                "JOIN MASTER_NEWS_LANGUAGES mnl ON mn.language_id = mnl.language_id " +
+                "JOIN MASTER_NEWS_LANGUAGES mnl ON v.newspaper_language = mnl.language_id " +
                 "WHERE us.subscription_start_date BETWEEN :startDate AND :endDate " +
                 "AND mnl.language_name = :language " +
                 "GROUP BY mn.newspaper_name " +
@@ -107,11 +107,11 @@ public class TrendingNewspaperRepository {
                 ))
                 .collect(Collectors.toList());
     }
+
     
     
     public List<TrendingNewspaperResponse> getTrendingNewspaperByState(Date startDate, Date endDate, String stateName) {
         Query query = entityManager.createNativeQuery(
-            "SELECT * FROM ( " +
             "SELECT mn.newspaper_name, COUNT(us.user_id) AS subscriber_count " +
             "FROM USER_SUBSCRIPTION us " +
             "JOIN VENDORS v ON us.newspaper_id = v.newspaper_id " +
@@ -121,8 +121,7 @@ public class TrendingNewspaperRepository {
             "WHERE us.subscription_start_date BETWEEN :startDate AND :endDate " +
             "AND ms.state_name = :stateName " +
             "GROUP BY mn.newspaper_name " +
-            "ORDER BY subscriber_count DESC) " +
-            "WHERE ROWNUM = 1"
+            "ORDER BY subscriber_count DESC"
         );
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
@@ -139,11 +138,11 @@ public class TrendingNewspaperRepository {
                 ))
                 .collect(Collectors.toList());
     }
+
     
 
     public List<TrendingNewspaperResponse> getTrendingNewspaperByDistrict(Date startDate, Date endDate, Long districtId) {
         Query query = entityManager.createNativeQuery(
-            "SELECT * FROM ( " +
             "SELECT mn.newspaper_name, COUNT(us.user_id) AS subscriber_count " +
             "FROM USER_SUBSCRIPTION us " +
             "JOIN VENDORS v ON us.newspaper_id = v.newspaper_id " +
@@ -153,8 +152,7 @@ public class TrendingNewspaperRepository {
             "WHERE us.subscription_start_date BETWEEN :startDate AND :endDate " +
             "AND md.district_id = :districtId " +
             "GROUP BY mn.newspaper_name " +
-            "ORDER BY subscriber_count DESC) " +
-            "WHERE ROWNUM = 1"
+            "ORDER BY subscriber_count DESC"
         );
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
@@ -172,6 +170,7 @@ public class TrendingNewspaperRepository {
                 .collect(Collectors.toList());
     }
 
+
     public List<TrendingNewspaperResponse> getTrendingNewspaperByStateByLanguage(Date startDate, Date endDate, String stateName, String language) {
         Query query = entityManager.createNativeQuery(
                 "SELECT mn.newspaper_name, COUNT(us.user_id) AS subscriber_count " +
@@ -180,7 +179,7 @@ public class TrendingNewspaperRepository {
                         "JOIN MASTER_NEWSPAPER mn ON v.newspaper_master_id = mn.newspaper_master_id " +
                         "JOIN MASTER_STATEWISE_LOCATIONS msl ON v.location_id = msl.location_id " +
                         "JOIN MASTER_STATES ms ON msl.state_id = ms.state_id " +
-                        "JOIN MASTER_NEWS_LANGUAGES mnl ON mn.language_id = mnl.language_id " +
+                        "JOIN MASTER_NEWS_LANGUAGES mnl ON v.newspaper_language = mnl.language_id " +
                         "WHERE us.subscription_start_date BETWEEN :startDate AND :endDate " +
                         "AND ms.state_name = :stateName " +
                         "AND mnl.language_name = :language " +
@@ -199,7 +198,7 @@ public class TrendingNewspaperRepository {
     private List<TrendingNewspaperResponse> mapToTrendingNewspaperResponse(List<Object[]> result, String language, String stateName) {
         return result.stream()
                      .map(row -> new TrendingNewspaperResponse((String) row[0], language, stateName, null, ((Number) row[1]).longValue()))
-                     .toList();
+                     .collect(Collectors.toList());
     }
     
    
@@ -211,7 +210,7 @@ public class TrendingNewspaperRepository {
                         "JOIN MASTER_NEWSPAPER mn ON v.newspaper_master_id = mn.newspaper_master_id " +
                         "JOIN MASTER_STATEWISE_LOCATIONS msl ON v.location_id = msl.location_id " +
                         "JOIN MASTER_DISTRICTS md ON msl.district_id = md.district_id " +
-                        "JOIN MASTER_NEWS_LANGUAGES mnl ON mn.language_id = mnl.language_id " +
+                        "JOIN MASTER_NEWS_LANGUAGES mnl ON v.newspaper_language = mnl.language_id " +
                         "WHERE us.subscription_start_date BETWEEN :startDate AND :endDate " +
                         "AND md.district_id = :districtId " +
                         "AND mnl.language_name = :language " +
@@ -227,56 +226,62 @@ public class TrendingNewspaperRepository {
         return mapToTrendingNewspaperResponse(result, language);
     }
 
+
     private List<TrendingNewspaperResponse> mapToTrendingNewspaperResponse(List<Object[]> result, String language) {
         return result.stream()
                      .map(row -> new TrendingNewspaperResponse((String) row[0], language, null, null, ((Number) row[1]).longValue()))
-                     .toList(); 
+                     .collect(Collectors.toList());
     }
+
 
     public List<TrendingNewspaperResponse> getTopTenNewspapersByState(Date startDate, Date endDate, String stateName) {
         Query query = entityManager.createNativeQuery(
+                "SELECT * FROM ( " +
                 "SELECT mn.newspaper_name, COUNT(us.user_id) AS subscriber_count " +
-                        "FROM USER_SUBSCRIPTION us " +
-                        "JOIN VENDORS v ON us.newspaper_id = v.newspaper_id " +
-                        "JOIN MASTER_NEWSPAPER mn ON v.newspaper_master_id = mn.newspaper_master_id " +
-                        "JOIN MASTER_STATEWISE_LOCATIONS msl ON v.location_id = msl.location_id " +
-                        "JOIN MASTER_STATES ms ON msl.state_id = ms.state_id " +
-                        "WHERE us.subscription_start_date BETWEEN :startDate AND :endDate " +
-                        "AND ms.state_name = :stateName " +
-                        "GROUP BY mn.newspaper_name " +
-                        "ORDER BY subscriber_count DESC " +
-                        "LIMIT 10"
+                "FROM USER_SUBSCRIPTION us " +
+                "JOIN VENDORS v ON us.newspaper_id = v.newspaper_id " +
+                "JOIN MASTER_NEWSPAPER mn ON v.newspaper_master_id = mn.newspaper_master_id " +
+                "JOIN MASTER_STATEWISE_LOCATIONS msl ON v.location_id = msl.location_id " +
+                "JOIN MASTER_STATES ms ON msl.state_id = ms.state_id " +
+                "WHERE us.subscription_start_date BETWEEN :startDate AND :endDate " +
+                "AND ms.state_name = :stateName " +
+                "GROUP BY mn.newspaper_name " +
+                "ORDER BY subscriber_count DESC " +
+                ") WHERE ROWNUM <= 10"
         );
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
         query.setParameter("stateName", stateName);
 
         List<Object[]> result = query.getResultList();
-        return mapToTrendingNewspaperResponseByState(result, stateName);
-    }
-
-    private List<TrendingNewspaperResponse> mapToTrendingNewspaperResponseByState(List<Object[]> result, String stateName) {
         return result.stream()
-                     .map(row -> new TrendingNewspaperResponse((String) row[0], null, stateName, null, ((Number) row[1]).longValue()))
-                     .toList(); // Assuming Java 16+ is used, otherwise use .collect(Collectors.toList())
+                     .map(row -> new TrendingNewspaperResponse(
+                             (String) row[0], 
+                             null, 
+                             stateName, 
+                             null, 
+                             ((BigDecimal) row[1]).longValue()
+                     ))
+                     .collect(Collectors.toList());
     }
  
     
     public List<TrendingNewspaperResponse> getTopTenNewspapersByStateByLanguage(Date startDate, Date endDate, String stateName, String language) {
         Query query = entityManager.createNativeQuery(
+                "SELECT * FROM ( " +
                 "SELECT mn.newspaper_name, COUNT(us.user_id) AS subscriber_count " +
-                        "FROM USER_SUBSCRIPTION us " +
-                        "JOIN VENDORS v ON us.newspaper_id = v.newspaper_id " +
-                        "JOIN MASTER_NEWSPAPER mn ON v.newspaper_master_id = mn.newspaper_master_id " +
-                        "JOIN MASTER_STATEWISE_LOCATIONS msl ON v.location_id = msl.location_id " +
-                        "JOIN MASTER_STATES ms ON msl.state_id = ms.state_id " +
-                        "JOIN MASTER_NEWS_LANGUAGES mnl ON mn.language_id = mnl.language_id " +
-                        "WHERE us.subscription_start_date BETWEEN :startDate AND :endDate " +
-                        "AND ms.state_name = :stateName " +
-                        "AND mnl.language_name = :language " +
-                        "GROUP BY mn.newspaper_name " +
-                        "ORDER BY subscriber_count DESC " +
-                        "LIMIT 10"
+                "FROM USER_SUBSCRIPTION us " +
+                "JOIN VENDORS v ON us.newspaper_id = v.newspaper_id " +
+                "JOIN MASTER_NEWSPAPER mn ON v.newspaper_master_id = mn.newspaper_master_id " +
+                "JOIN MASTER_STATEWISE_LOCATIONS msl ON v.location_id = msl.location_id " +
+                "JOIN MASTER_STATES ms ON msl.state_id = ms.state_id " +
+                "JOIN MASTER_NEWS_LANGUAGES mnl ON v.newspaper_language = mnl.language_id " +
+                "WHERE us.subscription_start_date BETWEEN :startDate AND :endDate " +
+                "AND ms.state_name = :stateName " +
+                "AND mnl.language_name = :language " +
+                "GROUP BY mn.newspaper_name " +
+                "ORDER BY subscriber_count DESC " +
+                ") WHERE ROWNUM <= 10"
         );
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
@@ -284,7 +289,15 @@ public class TrendingNewspaperRepository {
         query.setParameter("language", language);
 
         List<Object[]> result = query.getResultList();
-        return mapToTrendingNewspaperResponse(result, language, stateName);
+        return result.stream()
+                     .map(row -> new TrendingNewspaperResponse(
+                             (String) row[0], 
+                             language, 
+                             stateName, 
+                             null, 
+                             ((BigDecimal) row[1]).longValue()
+                     ))
+                     .collect(Collectors.toList());
     }
     
    
@@ -304,11 +317,11 @@ public class TrendingNewspaperRepository {
         List<Object[]> result = query.getResultList();
         return mapToTrendingNewspaperResponse(result);
     }
-
+    
     private List<TrendingNewspaperResponse> mapToTrendingNewspaperResponse(List<Object[]> result) {
         return result.stream()
                      .map(row -> new TrendingNewspaperResponse((String) row[0], null, null, null, ((Number) row[1]).longValue()))
-                     .toList(); 
+                     .collect(Collectors.toList());
     }
     
 
@@ -318,7 +331,7 @@ public class TrendingNewspaperRepository {
                         "FROM USER_SUBSCRIPTION us " +
                         "JOIN VENDORS v ON us.newspaper_id = v.newspaper_id " +
                         "JOIN MASTER_NEWSPAPER mn ON v.newspaper_master_id = mn.newspaper_master_id " +
-                        "JOIN MASTER_NEWS_LANGUAGES mnl ON mn.language_id = mnl.language_id " +
+                        "JOIN MASTER_NEWS_LANGUAGES mnl ON v.newspaper_language = mnl.language_id " +
                         "WHERE us.subscription_end_date BETWEEN :startDate AND :endDate " +
                         "AND mnl.language_name = :language " +
                         "GROUP BY mn.newspaper_name " +
