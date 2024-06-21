@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.poc.user.request.WelcomeRequest;
+import com.poc.auser.request.WelcomeRequest;
 
 public class WelcomeRequestTest {
 	

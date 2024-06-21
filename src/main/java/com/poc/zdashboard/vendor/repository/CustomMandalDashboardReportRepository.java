@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
-import com.poc.user.response.AvailableNewspapersByMandalwise;
+import com.poc.auser.response.AvailableNewspapersByMandalwise;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

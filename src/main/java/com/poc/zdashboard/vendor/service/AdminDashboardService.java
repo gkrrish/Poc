@@ -5,7 +5,7 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.poc.master.repository.MasterNewspaperRepository;
+import com.poc.auser.master.repository.MasterNewspaperRepository;
 import com.poc.zdashboard.vendor.repository.AdminDashboardCustomRepository;
 import com.poc.zdashboard.vendor.response.AdminDashboardDailyReportResponse;
 

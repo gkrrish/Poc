@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.poc.master.repository.MasterNewspaperRepository;
-import com.poc.user.service.UserSubscriptionService;
+import com.poc.auser.master.repository.MasterNewspaperRepository;
+import com.poc.auser.service.UserSubscriptionService;
 import com.poc.zdashboard.vendor.repository.CustomStateDashboardReportRepository;
 import com.poc.zdashboard.vendor.response.StatewiseAdminReportResponse;
 
