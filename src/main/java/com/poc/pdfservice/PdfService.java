@@ -14,7 +14,7 @@ import com.poc.invoice.PdfGeneratorService;
 import com.poc.master.entity.Invoice;
 import com.poc.master.repository.InvoiceRepository;
 import com.poc.repository.UserDetailsRepository;
-import com.poc.response.ExistingUserDetails;
+import com.poc.user.response.ExistingUserDetails;
 
 @Service
 public class PdfService {

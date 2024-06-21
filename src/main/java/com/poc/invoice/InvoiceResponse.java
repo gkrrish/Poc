@@ -3,7 +3,7 @@ package com.poc.invoice;
 import java.util.Date;
 import java.util.List;
 
-import com.poc.response.UserDetailsResponse;
+import com.poc.user.response.UserDetailsResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
