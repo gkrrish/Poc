@@ -9,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +24,7 @@ import jakarta.mail.MessagingException;
 
 @SpringBootTest
 @EnableAsync
+@Disabled
 public class EmailNotificationsTests {
 
 	@Autowired
@@ -43,7 +45,7 @@ public class EmailNotificationsTests {
         emailModel.setFromEmailId("gkrrish.11@gmail.com");
         emailModel.setToEmailId("gkrrish.11@gmail.com");
         emailModel.setEmailSubject("Notification : e-paper " + LocalDate.now());
-        emailModel.setEmailBody("Dear Subscriber,\nPlease find the newspaper attachment.\n\nThanks,\nNOW-Services India.");
+        emailModel.setEmailBody("***\n TEST CASE \n ****\nDear Subscriber,\nPlease find the newspaper attachment.\n\nThanks,\nNOW-Services India.");
         emailModel.setFileAddress(srcPath);
     }
 

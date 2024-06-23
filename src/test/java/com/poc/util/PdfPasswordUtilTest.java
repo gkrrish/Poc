@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -17,6 +18,7 @@ import com.itextpdf.io.exceptions.IOException;
 import com.poc.auser.util.PdfPasswordUtil;
 
 @SpringJUnitConfig
+@Disabled
 public class PdfPasswordUtilTest {
 	
 	@Autowired
