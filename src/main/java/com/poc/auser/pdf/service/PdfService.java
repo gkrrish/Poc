@@ -17,6 +17,7 @@ import com.poc.auser.pdf.invoice.InvoiceResponse;
 import com.poc.auser.pdf.invoice.PaymentDetails;
 import com.poc.auser.pdf.invoice.PdfGeneratorService;
 import com.poc.auser.response.ExistingUserDetails;
+import com.poc.exceptions.InvoiceUserDetailsNotFoundException;
 import com.poc.exceptions.UserDetailsNotFoundException;
 
 @Service
@@ -43,7 +44,8 @@ public class PdfService {
 		Optional<Invoice> invoiceUserDetails = invoiceRepository.findByUserOrderByInvoiceDateDesc(userDetails).stream().findFirst();
 		
 		if (invoiceUserDetails.isEmpty()) {
-			logger.info("No invoice Details found for user: {} " , userDetails.getUsername());
+			logger.error("No invoice Details found for user: {} " , userDetails.getUsername());
+			throw new InvoiceUserDetailsNotFoundException("No invoice details found for user: " + userDetails.getUsername());
 		}
 		
 		 InvoiceResponse invoice = new InvoiceResponse();
@@ -54,7 +56,7 @@ public class PdfService {
          invoice.setDate(invoiceUserDetails.get().getInvoiceDate());
          invoice.setTotalDue(existingUserDetails.getTotalSubscriptionCharges());
          invoice.setInvoiceNo(invoiceUserDetails.get().getInvoiceId());
-         
+		 
          PaymentDetails paymentDetails = new PaymentDetails();
          paymentDetails.setPaymentMethod("Credit Card");
          paymentDetails.setBankName("HDFC Bank, IFSC : HDFC0000808");
