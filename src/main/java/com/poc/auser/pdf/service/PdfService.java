@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +17,12 @@ import com.poc.auser.pdf.invoice.InvoiceResponse;
 import com.poc.auser.pdf.invoice.PaymentDetails;
 import com.poc.auser.pdf.invoice.PdfGeneratorService;
 import com.poc.auser.response.ExistingUserDetails;
+import com.poc.exceptions.UserDetailsNotFoundException;
 
 @Service
 public class PdfService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(PdfService.class);
 
 	@Autowired
 	private PdfGeneratorService pdfGeneratorService;
@@ -30,8 +35,16 @@ public class PdfService {
 	public byte[] generateInvoice(ExistingUserDetails existingUserDetails) throws IOException {
 		
 		Optional<UserDetails> userDetailsOptional = userDetailsRepository.findByMobileNumber(existingUserDetails.getMobileNumber());
+		if (userDetailsOptional.isEmpty()) {
+			logger.error("The User Details not found for mobile number : {} ", existingUserDetails.getMobileNumber());
+            throw new UserDetailsNotFoundException("User details not found for mobile number: " + existingUserDetails.getMobileNumber());
+        }
 		UserDetails userDetails = userDetailsOptional.get();
 		Optional<Invoice> invoiceUserDetails = invoiceRepository.findByUserOrderByInvoiceDateDesc(userDetails).stream().findFirst();
+		
+		if (invoiceUserDetails.isEmpty()) {
+			logger.info("No invoice Details found for user: {} " , userDetails.getUsername());
+		}
 		
 		 InvoiceResponse invoice = new InvoiceResponse();
          invoice.setInvoiceTo(userDetails.getUsername());
@@ -41,7 +54,6 @@ public class PdfService {
          invoice.setDate(invoiceUserDetails.get().getInvoiceDate());
          invoice.setTotalDue(existingUserDetails.getTotalSubscriptionCharges());
          invoice.setInvoiceNo(invoiceUserDetails.get().getInvoiceId());
-         
          
          PaymentDetails paymentDetails = new PaymentDetails();
          paymentDetails.setPaymentMethod("Credit Card");
