@@ -21,6 +21,7 @@ import com.poc.auser.master.entity.Country;
 import com.poc.auser.master.entity.State;
 import com.poc.auser.master.repository.BatchJobRepository;
 import com.poc.auser.master.repository.CountryRepository;
+import com.poc.auser.master.repository.CustomMandalDashboardReportRepository;
 import com.poc.auser.master.repository.DistrictRepository;
 import com.poc.auser.master.repository.IndianNewspaperLanguageRepository;
 import com.poc.auser.master.repository.MandalRepository;
@@ -33,7 +34,6 @@ import com.poc.auser.response.UserDetailsResponse;
 import com.poc.auser.response.WelcomeResponse;
 import com.poc.auser.util.BatchTimePeriod;
 import com.poc.auser.util.StringUtils;
-import com.poc.zdashboard.vendor.repository.CustomMandalDashboardReportRepository;
 
 @Service
 public class UserService {

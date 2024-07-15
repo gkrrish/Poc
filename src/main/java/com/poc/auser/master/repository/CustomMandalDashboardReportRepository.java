@@ -1,4 +1,4 @@
-package com.poc.zdashboard.vendor.repository;
+package com.poc.auser.master.repository;
 
 import java.util.Date;
 import java.util.List;
