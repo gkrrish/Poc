@@ -25,10 +25,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-import com.poc.auser.main.entity.UserDetails;
-import com.poc.auser.main.repository.UserDetailsRepository;
-import com.poc.auser.master.entity.Invoice;
-import com.poc.auser.master.repository.InvoiceRepository;
+import com.poc.main.entity.UserDetails;
+import com.poc.main.repository.UserDetailsRepository;
+import com.poc.master.entity.Invoice;
+import com.poc.master.repository.InvoiceRepository;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;

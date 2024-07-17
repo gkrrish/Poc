@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.poc.auser.main.entity.UserDetails;
-import com.poc.auser.main.repository.UserDetailsRepository;
+import com.poc.main.entity.UserDetails;
+import com.poc.main.repository.UserDetailsRepository;
 
 @SpringBootTest
 public class UserDetailsRepositoryTest {
