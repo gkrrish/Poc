@@ -15,7 +15,6 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.itextpdf.io.exceptions.IOException;
-import com.poc.util.PdfPasswordUtil;
 
 @SpringJUnitConfig
 @Disabled

@@ -109,7 +109,8 @@ public class CustomMandalDashboardReportRepository {
         return result != null ? result.toString() : null;
     }
     
-    public List<String> findMandalsByDistrictAndNewspaperMasterId(String districtName, int newspaperMasterId) {
+    @SuppressWarnings("unchecked")
+	public List<String> findMandalsByDistrictAndNewspaperMasterId(String districtName, int newspaperMasterId) {
         Query query = entityManager.createNativeQuery(
             "SELECT DISTINCT mm.mandal_name " +
             "FROM USER_SUBSCRIPTION us " +
@@ -125,7 +126,8 @@ public class CustomMandalDashboardReportRepository {
         return query.getResultList();
     }
     
-    public List<String> getDistrictsByStateAndNewspaperMasterId(String stateName, int newspaperMasterId) {
+    @SuppressWarnings("unchecked")
+	public List<String> getDistrictsByStateAndNewspaperMasterId(String stateName, int newspaperMasterId) {
         Query query = entityManager.createNativeQuery(
             "SELECT DISTINCT md.district_name " +
             "FROM USER_SUBSCRIPTION us " +
@@ -156,7 +158,8 @@ public class CustomMandalDashboardReportRepository {
         query.setParameter("stateName", stateName);
         query.setParameter("districtName", districtName);
 
-        List<Object[]> result = query.getResultList();
+        @SuppressWarnings("unchecked")
+		List<Object[]> result = query.getResultList();
 
         Map<String, List<String>> availableMandals = result.stream()
                 .collect(Collectors.groupingBy(

@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.poc.request.WelcomeRequest;
-
 public class WelcomeRequestTest {
 	
 	private static final String INDIAN_MOBILE_NUMBER_PREFIX = "+91";
