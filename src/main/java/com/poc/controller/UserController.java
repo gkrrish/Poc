@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.poc.helper.ResponseHelper;
 import com.poc.main.entity.UserDetails;
 import com.poc.master.entity.Vendor;
 import com.poc.master.entity.VendorDetails;
@@ -24,6 +25,7 @@ import com.poc.request.CreateVendorRequest;
 import com.poc.request.WelcomeRequest;
 import com.poc.response.AvailableNewspapersByMandalwise;
 import com.poc.response.ExistingUserDetails;
+import com.poc.response.WelcomeResponse;
 import com.poc.service.UserService;
 import com.poc.service.VendorService;
 
@@ -34,12 +36,17 @@ public class UserController {
 	private UserService userService;
 	@Autowired
     private VendorService vendorService;
-
-	@PostMapping("/welcome") // fake charges?
-	@ResponseStatus
-	public ResponseEntity<?> welcomeUser(@RequestBody WelcomeRequest request) throws IOException {
-		return userService.processWelcomeRequest(request);
-	}
+	
+	@PostMapping("/welcome") //fake charges
+    public ResponseEntity<?> welcomeUser(@RequestBody WelcomeRequest request) {
+        try {
+            WelcomeResponse welcomeResponse = userService.processWelcomeRequest(request);
+            return ResponseHelper.createResponse(welcomeResponse);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new WelcomeResponse("Failed to process request"));
+        }
+    }
+	
 	
 	@GetMapping("/user-subscription-details-ui/{mobileNumber}")
 	@ResponseStatus

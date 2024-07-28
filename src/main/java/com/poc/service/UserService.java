@@ -1,17 +1,11 @@
 package com.poc.service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.itextpdf.io.exceptions.IOException;
@@ -31,6 +25,8 @@ import com.poc.request.WelcomeRequest;
 import com.poc.response.AvailableNewspapersByMandalwise;
 import com.poc.response.ExistingUserDetails;
 import com.poc.response.UserDetailsResponse;
+import com.poc.response.WelcomeBackPDFResponse;
+import com.poc.response.WelcomeImageResponse;
 import com.poc.response.WelcomeResponse;
 import com.poc.util.BatchTimePeriod;
 import com.poc.util.StringUtils;
@@ -59,7 +55,7 @@ public class UserService {
 	
 	
 	
-	public ResponseEntity<?> processWelcomeRequest(WelcomeRequest request) throws java.io.IOException {
+	public WelcomeResponse processWelcomeRequest(WelcomeRequest request) throws java.io.IOException {
         ExistingUserDetails existingUserDetails = getSubscriptioinDetails(request.getMobileNumber());
 
         if (existingUserDetails==null ||existingUserDetails.getMobileNumber()==null|| existingUserDetails.getMobileNumber().isEmpty() || existingUserDetails.getMobileNumber().isBlank()) {
@@ -88,8 +84,7 @@ public class UserService {
 	}
 
 	public List<String> getAllLanguges() {
-		List<String> allLanguageNames = languageRepository.findAllLanguageNames();
-		return allLanguageNames;
+		return languageRepository.findAllLanguageNames();
 	}
 
 	public Optional<UserDetails> getUserDetails(Long userId) {
@@ -131,23 +126,23 @@ public class UserService {
 
 	
 
-    private ResponseEntity<?> generateWelcomeResponse() {
-        WelcomeResponse welcomeResponse = new WelcomeResponse(StringUtils.WELCOME_MESSAGE);
+    private WelcomeImageResponse generateWelcomeResponse() {
+    	WelcomeImageResponse welcomeResponse = new WelcomeImageResponse(StringUtils.WELCOME_MESSAGE);
         welcomeResponse.setLanguages(getAllLanguges());
-        return ResponseEntity.ok(welcomeResponse);
+        return welcomeResponse;
     }
 
-    private ResponseEntity<?> generateInvoiceResponse(ExistingUserDetails existingUserDetails) throws java.io.IOException {
-    	String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MMMYYYY"));
+    private WelcomeBackPDFResponse generateInvoiceResponse(ExistingUserDetails existingUserDetails) throws java.io.IOException {
+    	
+    	WelcomeBackPDFResponse  welcomeBackPDFResponse=new WelcomeBackPDFResponse (StringUtils.WELCOME_BACK_MESSAGE);
         try {
             byte[] invoice = pdfService.generateInvoice(existingUserDetails);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDispositionFormData("attachment", todayDate+"_invoice"+".pdf");
-            return new ResponseEntity<>(invoice, headers, HttpStatus.OK);
+            welcomeBackPDFResponse.setInvoice(invoice);
+            return welcomeBackPDFResponse;
         } catch (IOException e) {
-            e.printStackTrace(); // Handle the exception properly, maybe return an error response
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to generate invoice");
+            e.getMessage(); // Handle the exception properly, maybe return an error response
+            welcomeBackPDFResponse.setMessage("Faild to generate the PDF File, our support team is going to work on this!");
+            return welcomeBackPDFResponse;
         }
     }
 
