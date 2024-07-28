@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class WelcomeBackPDFResponse extends WelcomeResponse {
     private byte[] invoice;
+    private String delta;
 
     public WelcomeBackPDFResponse(String message) {
         super(message);

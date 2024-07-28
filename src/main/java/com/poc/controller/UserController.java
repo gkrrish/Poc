@@ -39,6 +39,7 @@ public class UserController {
 	
 	@PostMapping("/welcome") //fake charges
     public ResponseEntity<?> welcomeUser(@RequestBody WelcomeRequest request) {
+		System.out.println("Remove USE LOGGER : welcome request "+request.toString());
         try {
             WelcomeResponse welcomeResponse = userService.processWelcomeRequest(request);
             return ResponseHelper.createResponse(welcomeResponse);
