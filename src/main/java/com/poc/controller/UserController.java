@@ -37,9 +37,9 @@ public class UserController {
 	@Autowired
     private VendorService vendorService;
 	
-	@PostMapping("/welcome") //fake charges
+	@PostMapping("/welcome")  //Fake Charges ?
     public ResponseEntity<?> welcomeUser(@RequestBody WelcomeRequest request) {
-		System.out.println("Remove USE LOGGER : welcome request "+request.toString());
+        System.out.println("Remove USE LOGGER : welcome request " + request.toString());
         try {
             WelcomeResponse welcomeResponse = userService.processWelcomeRequest(request);
             return ResponseHelper.createResponse(welcomeResponse);
@@ -47,7 +47,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new WelcomeResponse("Failed to process request"));
         }
     }
-	
 	
 	@GetMapping("/user-subscription-details-ui/{mobileNumber}")
 	@ResponseStatus

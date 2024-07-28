@@ -126,7 +126,7 @@ public class UserService {
 
 	
 
-    private WelcomeImageResponse generateWelcomeResponse() {
+    private WelcomeImageResponse generateWelcomeResponse() throws java.io.IOException {
     	WelcomeImageResponse welcomeResponse = new WelcomeImageResponse(StringUtils.WELCOME_MESSAGE);
         welcomeResponse.setLanguages(getAllLanguges());
         return welcomeResponse;
