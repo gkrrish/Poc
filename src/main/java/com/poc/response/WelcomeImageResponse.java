@@ -12,29 +12,15 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class WelcomeImageResponse extends WelcomeResponse {
-    private byte[] imageData;
     private String imageBase64;
 
-    public WelcomeImageResponse(String message) throws IOException {
+    public WelcomeImageResponse(String message) {
         super(message);
-        this.loadImageBytes();
-        this.setImageBase64();
     }
 
-    private void loadImageBytes() {
-        try {
-            ClassPathResource resource = new ClassPathResource("images/welcome-banner.PNG");
-            this.imageData = Files.readAllBytes(resource.getFile().toPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * This is is using for the, " some time our controller returns the PDF /Image so getting response.body is not at possible so that both model 
-     * classes converted to base64 so that the headers and body content we can able to fetch.
-     */
-    private void setImageBase64() { 
-        this.imageBase64 = Base64.getEncoder().encodeToString(this.imageData);
+    public void setImageBase64() throws IOException {
+        ClassPathResource resource = new ClassPathResource("images/welcome-banner.PNG");
+        byte[] imageData = Files.readAllBytes(resource.getFile().toPath());
+        this.imageBase64 = Base64.getEncoder().encodeToString(imageData);
     }
 }

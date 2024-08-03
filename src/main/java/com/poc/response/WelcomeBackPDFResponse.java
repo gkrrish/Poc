@@ -1,13 +1,13 @@
 package com.poc.response;
 
+import java.util.Base64;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import java.util.Base64;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class WelcomeBackPDFResponse extends WelcomeResponse {
-    private byte[] invoice;
     private String invoiceBase64;
     private String delta;
 
@@ -15,14 +15,11 @@ public class WelcomeBackPDFResponse extends WelcomeResponse {
         super(message);
     }
 
-    public WelcomeBackPDFResponse(String message, byte[] invoice, String delta) {
-        super(message);
-        this.invoice = invoice;
-        this.delta = delta;
-        this.setInvoiceBase64();
+    public void setInvoiceBase64(byte[] invoice) {
+        this.invoiceBase64 = Base64.getEncoder().encodeToString(invoice);
     }
 
-    private void setInvoiceBase64() {
-        this.invoiceBase64 = Base64.getEncoder().encodeToString(this.invoice);
+    public void setDelta(String delta) {
+        this.delta = delta;
     }
 }
