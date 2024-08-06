@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,8 @@ import com.poc.service.VendorService;
 
 @RestController
 public class UserController {
+	
+	private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
 	@Autowired
 	private UserService userService;
@@ -39,7 +43,7 @@ public class UserController {
 	
 	@PostMapping("/welcome")  //Fake Charges ?
     public ResponseEntity<?> welcomeUser(@RequestBody WelcomeRequest request) {
-        System.out.println("Remove USE LOGGER : welcome request " + request.toString());
+        log.info("welcome request {}", request);
         try {
             WelcomeResponse welcomeResponse = userService.processWelcomeRequest(request);
             return ResponseHelper.createResponse(welcomeResponse);
@@ -47,6 +51,12 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new WelcomeResponse("Failed to process request"));
         }
     }
+	
+	@GetMapping("/languages")
+	public List<String> getAllLanguages() {
+		return userService.getAllLanguges();
+	}
+
 	
 	@GetMapping("/user-subscription-details-ui/{mobileNumber}")
 	@ResponseStatus

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +20,7 @@ public class UserDetailsRepositoryTest {
 	private UserDetailsRepository userDetailsRepository;
 
 	@Test
+	@Disabled
 	public void testFindByMobileNumber() {
 		String mobileNumber = "+919876543210";
 

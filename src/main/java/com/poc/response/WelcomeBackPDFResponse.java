@@ -2,11 +2,18 @@ package com.poc.response;
 
 import java.util.Base64;
 
+import com.esotericsoftware.kryo.DefaultSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@DefaultSerializer
+@JsonSerialize
+@JsonDeserialize
 public class WelcomeBackPDFResponse extends WelcomeResponse {
     private String invoiceBase64;
     private String delta;
