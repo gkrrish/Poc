@@ -138,7 +138,7 @@ public class UserService {
         try {
             byte[] invoice = pdfService.generateInvoice(existingUserDetails);
             welcomeBackPDFResponse.setInvoiceBase64(invoice);
-            welcomeBackPDFResponse.setDelta("Do you want to Change :) ");
+            welcomeBackPDFResponse.setDelta("Do you want to Change");
             return welcomeBackPDFResponse;
         } catch (IOException e) {
             e.getMessage(); // Handle the exception properly, maybe return an error response

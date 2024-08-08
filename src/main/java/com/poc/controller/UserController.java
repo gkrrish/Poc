@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.poc.helper.ResponseHelper;
+import com.poc.main.entity.DailyBanner;
 import com.poc.main.entity.UserDetails;
 import com.poc.master.entity.Vendor;
 import com.poc.master.entity.VendorDetails;
@@ -26,8 +27,10 @@ import com.poc.request.CreateVendorDetailsRequest;
 import com.poc.request.CreateVendorRequest;
 import com.poc.request.WelcomeRequest;
 import com.poc.response.AvailableNewspapersByMandalwise;
+import com.poc.response.BannerImageResponse;
 import com.poc.response.ExistingUserDetails;
 import com.poc.response.WelcomeResponse;
+import com.poc.service.DailyBannerService;
 import com.poc.service.UserService;
 import com.poc.service.VendorService;
 
@@ -40,6 +43,9 @@ public class UserController {
 	private UserService userService;
 	@Autowired
     private VendorService vendorService;
+
+	@Autowired
+	private DailyBannerService dailyBannerService;
 	
 	@PostMapping("/welcome")  //Fake Charges ?
     public ResponseEntity<?> welcomeUser(@RequestBody WelcomeRequest request) {
@@ -52,6 +58,34 @@ public class UserController {
         }
     }
 	
+	@GetMapping("/banner/{id}")
+    public ResponseEntity<?> getBannerById(@PathVariable Integer id) throws IOException {
+        Optional<DailyBanner> dailyBannerOptional = dailyBannerService.getBannerById(id);
+
+        if (dailyBannerOptional.isPresent()) {
+            DailyBanner dailyBanner = dailyBannerOptional.get();
+            String bannerFilePath = dailyBannerService.saveBannerImage(dailyBanner.getBannerFilePath());
+            BannerImageResponse response = new BannerImageResponse(bannerFilePath);
+            return ResponseHelper.createImageResponse(response.getImageBase64());
+        } else {
+        	 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new WelcomeResponse("Failed to process request"));
+        }
+    }
+	
+	@GetMapping("/banner-by-location/{locationId}/{newspaperId}")
+    public ResponseEntity<?> getBannerByLocationAndNewspaper(@PathVariable Long locationId, @PathVariable Long newspaperId) throws IOException {
+        Optional<DailyBanner> dailyBannerOptional = dailyBannerService.getBannerByLocationAndNewspaper(locationId, newspaperId);
+
+        if (dailyBannerOptional.isPresent()) {
+            DailyBanner dailyBanner = dailyBannerOptional.get();
+            String bannerFilePath = dailyBannerService.saveBannerImage(dailyBanner.getBannerFilePath());
+            BannerImageResponse response = new BannerImageResponse(bannerFilePath);
+            return ResponseHelper.createImageResponse(response.getImageBase64());
+        } else {
+        	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new WelcomeResponse("Failed to process request"));
+        }
+    }
+
 	@GetMapping("/languages")
 	public List<String> getAllLanguages() {
 		return userService.getAllLanguges();

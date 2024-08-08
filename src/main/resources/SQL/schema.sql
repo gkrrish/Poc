@@ -182,6 +182,16 @@ CREATE TABLE INVOICE (
     FOREIGN KEY (UserID) REFERENCES USER_DETAILS(UserID)
 );
 
+CREATE TABLE DAILY_BANNER (
+    banner_id INT PRIMARY KEY,
+    location_id INT,
+    newspaper_id INT,
+    banner_file_location VARCHAR2(512),
+    FOREIGN KEY (location_id) REFERENCES MASTER_STATEWISE_LOCATIONS(location_id),
+    FOREIGN KEY (newspaper_id) REFERENCES MASTER_NEWSPAPER(newspaper_master_id)
+);
+
+
 =============================================================================================================================
 
 -- Create the function generate_location_name in PL/SQL

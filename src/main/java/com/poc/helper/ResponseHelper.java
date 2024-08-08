@@ -53,4 +53,18 @@ public class ResponseHelper {
         
         return new ResponseEntity<>(imageData, headers, HttpStatus.OK);
     }
+    
+    public static ResponseEntity<byte[]> createImageResponse(String imageBase64) {
+        byte[] imageData = Base64.getDecoder().decode(imageBase64);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_PNG);  // or MediaType.IMAGE_JPEG if it's a JPEG
+        headers.setContentDispositionFormData("attachment", "welcome-back-banner.png");
+        headers.setContentLength(imageData.length);
+        
+        return new ResponseEntity<>(imageData, headers, HttpStatus.OK);
+    }
+    
+    /**
+     * Later re-factor this methods to send the MultiValueMap body or JsonObject so that it would be good
+     */
 }
